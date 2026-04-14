@@ -1,0 +1,36 @@
+# Qt 构建目录
+build/
+cmake-build-*/
+Makefile
+*.mak
+*.cmake
+
+# 编译产物
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.pdb
+*.idb
+*.ilk
+*.manifest
+
+# Qt 自动生成的文件
+*.moc
+*.ui.h
+*.qrc.cpp
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+CMakeCache.txt
+compile_commands.json
+
+# IDE/编辑器配置
+.vs/
+.vscode/
+*.user
+*.suo
