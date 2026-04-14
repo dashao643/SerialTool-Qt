@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     btnInit();
     uiInit();
+    // 123
 }
 
 MainWindow::~MainWindow()
