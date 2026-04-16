@@ -10,15 +10,18 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    customdatasendwidget.cpp \
     main.cpp \
     mainwindow.cpp \
     serialsettingdialog.cpp
 
 HEADERS += \
+    customdatasendwidget.h \
     mainwindow.h \
     serialsettingdialog.h
 
 FORMS += \
+    customdatasendwidget.ui \
     mainwindow.ui \
     serialsettingdialog.ui
 
@@ -26,3 +29,13 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res.qrc
+
+RC_ICONS = usb_blue.ico
+
+VERSION = 1.0.0
+#把VERSION定义成预编译宏，传递到代码中
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+# DEFINES += QT_NO_DEBUG_OUTPUT
