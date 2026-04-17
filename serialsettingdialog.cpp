@@ -11,11 +11,10 @@ SerialSettingDialog::SerialSettingDialog(QWidget *parent)
 
     comboBoxInit();
 
-    // 当前默认索引根据配置文件
-    // 无配置文件
-    m_dataBits = QSerialPort::Data8;
-    m_stopBits = QSerialPort::OneStop;
-    m_parity = QSerialPort::NoParity;
+    m_dataBits = QSerialPort::Data8;                // 数据位
+    m_stopBits = QSerialPort::OneStop;              // 停止位
+    m_parity = QSerialPort::NoParity;               // 校验位
+    m_flowControl = QSerialPort::NoFlowControl;     // 控制流
 
     ui->cbBox_DataBit->setCurrentIndex(ui->cbBox_DataBit->findData(QSerialPort::Data8));
     ui->cbBox_StopBit->setCurrentIndex(ui->cbBox_StopBit->findData(QSerialPort::OneStop));

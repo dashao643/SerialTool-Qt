@@ -13,11 +13,14 @@ SOURCES += \
     customdatasendwidget.cpp \
     main.cpp \
     mainwindow.cpp \
+    modbustab.cpp \
     serialsettingdialog.cpp
 
 HEADERS += \
     customdatasendwidget.h \
+    dataStructure.h \
     mainwindow.h \
+    modbustab.h \
     serialsettingdialog.h
 
 FORMS += \

@@ -5,12 +5,16 @@
 
 #include <QPushButton>
 #include <QFontDialog>
+#include <QColorDialog>
+#include <QFileDialog>
+#include <QDir>
 #include <QSerialPortInfo>
 #include <QSettings>
 #include <QMessageBox>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     dataInit();
     slotsInit();
     uiInit();
-    iniFileInit();
+    loadConfig();
 }
 
 MainWindow::~MainWindow()
@@ -36,6 +40,7 @@ MainWindow::~MainWindow()
 void MainWindow::dataInit()
 {
     m_comPort = new QSerialPort(this);
+
     m_standardBaudRates = QSerialPortInfo::standardBaudRates();
 
     // 状态栏提示定时器
@@ -43,20 +48,11 @@ void MainWindow::dataInit()
     m_infoTimer->setSingleShot(true);
     connect(m_infoTimer,&QTimer::timeout,ui->label_Info,&QLabel::clear);
 
-    // 默认波特率索引
-    // if(配置文件中内容存在){
-    //     defaultBaudRateIndex = 配置文件中内容
-    // }
-    /// 无配置文件，默认选择115200
-    // else{
-        m_defaultBaudRateIndex = qMax(0, m_standardBaudRates.size() - 3);
-    // }
-
     /// 默认串口配置
-    m_comPort->setDataBits(QSerialPort::Data8);
-    m_comPort->setStopBits(QSerialPort::OneStop);
-    m_comPort->setParity(QSerialPort::NoParity);
-    m_comPort->setFlowControl(QSerialPort::NoFlowControl);
+    m_serialConfig.dataBits = QSerialPort::Data8;
+    m_serialConfig.stopBits = QSerialPort::OneStop;
+    m_serialConfig.parity = QSerialPort::NoParity;
+    m_serialConfig.flowControl = QSerialPort::NoFlowControl;
 
     // 接收超时
     m_rxTimer = new QTimer(this);
@@ -67,15 +63,14 @@ void MainWindow::dataInit()
     m_sendTimer = new QTimer(this);
     connect(m_sendTimer, &QTimer::timeout, this, &MainWindow::do_btnComSendData);
 
-    showWindowFont = ui->plainTextEdit_Show->font();
-    showWindowFont.setPointSize(12);
-    ui->plainTextEdit_Show->setFont(showWindowFont);
+    m_settings = new QSettings("serial.ini", QSettings::IniFormat, this);
 }
 
 void MainWindow::uiInit()
 {
     // 展示页面不可编辑
     ui->plainTextEdit_Show->setReadOnly(true);
+
     // 初始先刷新端口
     do_cbBoxPortNumRefresh();
 
@@ -83,9 +78,6 @@ void MainWindow::uiInit()
     foreach(qint32 BaudRate,QSerialPortInfo::standardBaudRates()){
         ui->cbBox_PortBuad->addItem(QString::number(BaudRate));
     }
-
-    ui->cbBox_PortBuad->setCurrentIndex(m_defaultBaudRateIndex);
-    ui->tabWidget->setCurrentIndex(sendModel::CUSTOM);
 }
 
 /**
@@ -113,13 +105,78 @@ void MainWindow::slotsInit()
 /**
  * @brief 根据配置文件，初始化所有设置
  */
-void MainWindow::iniFileInit()
+void MainWindow::loadConfig()
 {
-    // iniFile.setFileName("serial.ini");
-    // if(iniFile.open())
-    // QSettings settingFile("",QSettings::IniFormat,this);
+    /// 窗口大小
+    // this->resize(m_settings->value("MainWindow/Width", DEFAULT_WINDOW_WIDTH).toInt(),
+    //              m_settings->value("MainWindow/Height", DEFAULT_WINDOW_HEIGHT).toInt());
 
-    ui->ckBox_Addn->setDisabled(ui->rdBtn_SendHex->isChecked());
+    /// 波特率,默认选择 115200
+    m_baudRateIndex = qMax(0, m_standardBaudRates.size() - 3);
+    ui->cbBox_PortBuad->setCurrentIndex(
+        m_settings->value("ComConfig/BaudIndex", m_baudRateIndex).toInt());
+
+    /// 发送模式
+    ui->rdBtn_SendHex->setChecked(
+        m_settings->value("SendMode/Hex", true).toBool());
+    ui->rdBtn_SendASCII->setChecked(
+        m_settings->value("SendMode/ASCII", false).toBool());
+
+    /// 加换行
+    ui->ckBox_Addn->setChecked(
+        m_settings->value("Send/addn",true).toBool());
+
+    /// 加校验
+    ui->cbBox_DataCheck->setCurrentIndex(
+        m_settings->value("Send/CheckMode", CheckDataIndex::NONE_CHECK).toInt());
+
+    /// 定时发送时间
+    ui->spBox_SendTime->setValue(
+        m_settings->value("Send/TimeInterval", 1000).toInt());
+
+    /// 显示模式
+    ui->rdBtn_ShowHex->setChecked(
+        m_settings->value("ShowMode/Hex", true).toBool());
+    ui->rdBtn_ShowASCII->setChecked(
+        m_settings->value("ShowMode/ASCII", false).toBool());
+
+    /// 接收超时
+    ui->spBox_Timeout->setValue(
+        m_settings->value("Receive/Timeout", 20).toInt());
+
+    /// 解析格式
+    // ui->cbBox_Proces->setCurrentIndex(
+    //     m_settings->value("Receive/dataProcess", SendProtocol::CUSTOM).toInt());
+
+    /// 串口其他设置
+
+    /// 保存文件路径
+    // m_saveTextFilePath = m_settings->value("ToolBar/filePath", QDir::currentPath()).toString();
+
+    /// 字体设置
+    QFont font = m_settings->value("ShowWindow/font", QFont("Microsoft YaHei UI", 12)).value<QFont>();
+    ui->plainTextEdit_Show->setFont(font);
+
+    /// 背景颜色
+    QColor bgColor = m_settings->value("ShowWindow/bgColor", QColor(Qt::white)).value<QColor>();
+    QPalette palette = ui->plainTextEdit_Show->palette();
+    palette.setColor(QPalette::Base, bgColor);
+    ui->plainTextEdit_Show->setPalette(palette);
+
+    /// 窗口可见
+    if(!m_settings->value("ToolBar/dockVisible", true).toBool()){
+        on_actDockVisible_triggered(false);
+        ui->actDockVisible->setChecked(false);
+    }
+
+    /// dock栏页面
+    // ui->tabWidget->setCurrentIndex(
+    //     m_settings->value("TabWidget/tabIndex", SendProtocol::CUSTOM).toInt());
+
+    /// 自定义项和自定义数据
+    loadCustomItem();
+
+    labelInfoRefresh("配置加载成功");
 }
 
 // 刷新串口列表
@@ -162,20 +219,22 @@ void MainWindow::do_btnOpenClose()
             }
         }
         if(!exist){
-            labelInfoRefresh(m_curPortName+"串口已断开，请刷新");
+        QMessageBox::information(this,"提示",
+                                 "当前串口已断开");
             return;
         }
-        /// 当前存在，，先配置，打开端口
         m_comPort->setPort(curPortInfo);
+        /// 先配置，打开端口
         comPortSetting();
         if(!m_comPort->open(QIODeviceBase::ReadWrite)){
             QMessageBox::information(this,"提示",
-                                     "当前串口号无法打开！\n"
-                                     "请检查串口是否被占用或已断开");
+                                     "当前串口无法打开\n"
+                                     "请检查串口是否被占用");
             return;
         }
         /// 按钮变红色
         ui->btn_OpenClose->setText("关闭串口");
+
         labelInfoRefresh(m_curPortName+"已打开");
         /// 打开此端口后，不能选择其他端口
         ui->cbBox_PortNum->setDisabled(true);
@@ -190,6 +249,8 @@ void MainWindow::do_btnOpenClose()
         ui->cbBox_PortNum->setDisabled(false);
     }
     m_isPortOpen = !m_isPortOpen;
+
+    ui->actPortSetting->setDisabled(m_isPortOpen);
 }
 
 /**
@@ -222,41 +283,18 @@ void MainWindow::do_showReceivedData()
     m_receiveBuffer.clear();
 }
 
+/**
+ * @brief 主界面发送按钮
+ */
 void MainWindow::do_btnComSendData()
 {
-    if(!m_comPort->isOpen()){
-        labelInfoRefresh("串口未打开，发送失败");
-        return;
-    }
-    QByteArray sendBuf;
-    QString text = ui->plainTextEdit_Send->toPlainText();
+    QString content = ui->plainTextEdit_Send->toPlainText();
+    SendModel sendModel = HEX;
 
-    // ASCII发送
     if (ui->rdBtn_SendASCII->isChecked()){
-        if(ui->ckBox_Addn->isChecked())
-            text.append("\r\n");
-        /// UTF8 或 Local8Bit
-        sendBuf = text.toLocal8Bit();
+        sendModel = ASCII;
     }
-    // Hex发送
-    else if(ui->rdBtn_SendHex->isChecked()){
-        /// 去掉所有空格
-        text.remove(" ");
-        /// 过滤掉 0-9、A-F、a-f 以外的所有非法字符
-        text.remove(QRegularExpression("[^0-9a-fA-F]"));
-        /// 转成 QByteArray
-        sendBuf = QByteArray::fromHex(text.toUtf8());
-        appendCheckData(sendBuf);
-    }
-    if (sendBuf.isEmpty()) {
-        labelInfoRefresh("发送内容不能为空");
-        return;
-    }
-
-    m_comPort->write(sendBuf);
-    // 发送内容展示
-    showSendData(sendBuf);
-    labelInfoRefresh(QString("发送成功 %1 字节").arg(sendBuf.size()));
+    sendData(content,sendModel);
 }
 
 // QAction槽函数
@@ -264,14 +302,10 @@ void MainWindow::on_actPortSetting_triggered()
 {
     SerialSettingDialog settingDialog(this);
     if(settingDialog.exec() == QDialog::Accepted){
-        qDebug() << "数据位：" << settingDialog.m_dataBits;
-        qDebug() << "停止位：" << settingDialog.m_stopBits;
-        qDebug() << "校验位：" << settingDialog.m_parity;
-
-        m_comPort->setDataBits(settingDialog.m_dataBits);
-        m_comPort->setStopBits(settingDialog.m_stopBits);
-        m_comPort->setParity(settingDialog.m_parity);
-
+        m_serialConfig.dataBits = settingDialog.m_dataBits;
+        m_serialConfig.stopBits = settingDialog.m_stopBits;
+        m_serialConfig.parity = settingDialog.m_parity;
+        qDebug()<<m_serialConfig.parity;
         labelInfoRefresh("串口配置修改成功");
     }
 }
@@ -279,6 +313,39 @@ void MainWindow::on_actPortSetting_triggered()
 void MainWindow::on_actClear_triggered()
 {
     ui->plainTextEdit_Show->clear();
+    labelInfoRefresh("清除成功");
+}
+
+void MainWindow::on_actSave_triggered()
+{
+    if(ui->plainTextEdit_Show->toPlainText().isEmpty()){
+        labelInfoRefresh("无内容，保存失败");
+        return;
+    }
+    QString defaultName = QDate::currentDate().toString("yyyy-MM-dd_");
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        "保存日志文件",
+        QDir::currentPath() + QString("/%1.txt").arg(defaultName),  // 默认路径 + 默认文件名
+        "文本文件 (*.txt);;所有文件 (*.*)"      // 文件格式
+        );
+
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::information(this,"提示","保存失败");
+        return;
+    }
+
+    // 把显示区的所有内容写进去
+    QTextStream out(&file);
+    out << ui->plainTextEdit_Show->toPlainText();
+    file.close();
+
+    labelInfoRefresh("日志保存成功：" + fileName);
 }
 
 void MainWindow::on_actFont_triggered()
@@ -295,6 +362,20 @@ void MainWindow::on_actFont_triggered()
     }
 }
 
+void MainWindow::on_actBackgroundSetting_triggered()
+{
+    QColor currentColor = ui->plainTextEdit_Show->palette().color(QPalette::Base);
+    QColor bgColor = QColorDialog::getColor(currentColor, this, "选择背景色");
+
+    if (!bgColor.isValid()) {
+        return;
+    }
+
+    QPalette palette = ui->plainTextEdit_Show->palette();
+    palette.setColor(QPalette::Base, bgColor);
+    ui->plainTextEdit_Show->setPalette(palette);
+}
+
 void MainWindow::on_actDockFloat_triggered(bool checked)
 {
     ui->dockWidget->setFloating(checked);
@@ -308,15 +389,18 @@ void MainWindow::on_actDockVisible_triggered(bool checked)
 void MainWindow::on_actAdd_triggered()
 {
     QListWidgetItem *addItem = new QListWidgetItem;
-    ui->listWidget->addItem(addItem);
-
-    // 自己做一个带按钮 + 输入框的 widget
+    /// 按钮 + 输入框的 widget
     CustomDataSendWidget *w = new CustomDataSendWidget;
-    // 把这个带内容的 widget 放进去
-    ui->listWidget->setItemWidget(addItem, w);
 
-    // 必须设置高度！
+    ui->listWidget->addItem(addItem);
+    ui->listWidget->setItemWidget(addItem, w);
+    /// 必须设置高度
     addItem->setSizeHint(QSize(0,60));
+    connect(w, &CustomDataSendWidget::sendDataRequest,this,
+        [=](const QString &content, SendModel model){
+        QString str = content;
+        sendData(str,model);
+    });
 }
 
 void MainWindow::on_actDel_triggered()
@@ -329,11 +413,6 @@ void MainWindow::on_actDel_triggered()
     QListWidgetItem* item = ui->listWidget->takeItem(row);
     delete item;
     labelInfoRefresh("删除项成功");
-}
-
-void MainWindow::on_actAddComment_triggered()
-{
-
 }
 
 void MainWindow::on_cbBox_PortBuad_currentIndexChanged(int index)
@@ -366,35 +445,175 @@ void MainWindow::on_listWidget_customContextMenuRequested(const QPoint &pos)
 {
     Q_UNUSED(pos);
     QMenu *menuList = new QMenu(this);
-    menuList->addAction(ui->actAddComment);
+    // menuList->addAction(ui->actAddComment);
     // menuList->addSeparator();
-    // menuList->addAction(ui->actDel);
+    menuList->addAction(ui->actDel);
     /// 在鼠标光标位置显示快捷菜单
     menuList->exec(QCursor::pos());
     /// 菜单显示完后，删除对象
     delete menuList;
 }
 
+/**
+ * @brief 根据配置文件加载自定义项，默认五个项
+ */
+void MainWindow::loadCustomItem()
+{
+    // 清空界面
+    ui->listWidget->clear();
+
+    // 读取配置里保存了多少项
+    int count = m_settings->value("CustomItems/Count", 0).toInt();
+
+    // 如果配置里没有, 默认创建 5 个空项
+    if (count <= 0) {
+        for (int i = 0; i < 5; i++) {
+            on_actAdd_triggered();
+        }
+        return;
+    }
+
+    // 有配置, 按配置逐条恢复
+    for (int i = 0; i < count; i++) {
+        on_actAdd_triggered();
+
+        // 获取刚添加的 item 和 widget
+        QListWidgetItem* item = ui->listWidget->item(i);
+        CustomDataSendWidget* w = (CustomDataSendWidget*)ui->listWidget->itemWidget(item);
+
+        // 从配置读取数据
+        QString remark = m_settings->value(QString("CustomItems/%1/Remark").arg(i)).toString();
+        QString content = m_settings->value(QString("CustomItems/%1/Content").arg(i)).toString();
+        bool isHex = m_settings->value(QString("CustomItems/%1/IsHex").arg(i)).toBool();
+
+        // 填回控件
+        w->setRemark(remark);
+        w->setContent(content);
+        if(isHex)
+            w->setModel(SendModel::HEX);
+        else
+            w->setModel(SendModel::ASCII);
+    }
+}
+
+void MainWindow::saveCustomItem()
+{
+    int count = ui->listWidget->count();
+    m_settings->setValue("CustomItems/Count", count);
+
+    for (int i = 0; i < count; i++) {
+        QListWidgetItem* item = ui->listWidget->item(i);
+        CustomDataSendWidget* w = (CustomDataSendWidget*)ui->listWidget->itemWidget(item);
+
+        // 读取控件里的内容
+        QString remark = w->getRemark();
+        QString content = w->getContent();
+        bool isHex = false;
+        if(w->getModel() == SendModel::HEX)
+            isHex = true;
+
+        // 写入配置
+        m_settings->setValue(QString("CustomItems/%1/Remark").arg(i), remark);
+        m_settings->setValue(QString("CustomItems/%1/Content").arg(i), content);
+        m_settings->setValue(QString("CustomItems/%1/IsHex").arg(i), isHex);
+    }
+}
+
+void MainWindow::saveConfig()
+{
+    // 窗口大小
+    // m_settings->setValue("MainWindow/Width", this->width());
+    // m_settings->setValue("MainWindow/Height", this->height());
+
+    // 波特率
+    m_settings->setValue("ComConfig/BaudIndex", ui->cbBox_PortBuad->currentIndex());
+
+    // 发送模式
+    m_settings->setValue("SendMode/Hex", ui->rdBtn_SendHex->isChecked());
+    m_settings->setValue("SendMode/ASCII", ui->rdBtn_SendASCII->isChecked());
+
+    // 发送自动加换行
+    m_settings->setValue("Send/addn", ui->ckBox_Addn->isChecked());
+
+    // 校验模式
+    m_settings->setValue("Send/CheckMode", ui->cbBox_DataCheck->currentIndex());
+
+    // 定时发送时间
+    m_settings->setValue("Send/TimeInterval", ui->spBox_SendTime->value());
+
+    // 显示模式
+    m_settings->setValue("ShowMode/Hex", ui->rdBtn_ShowHex->isChecked());
+    m_settings->setValue("ShowMode/ASCII", ui->rdBtn_ShowASCII->isChecked());
+
+    // 接收超时
+    m_settings->setValue("Receive/Timeout", ui->spBox_Timeout->value());
+
+    // 接收解析格式
+    // m_settings->setValue("Receive/dataProcess", ui->cbBox_Proces->currentIndex());
+
+    // 文件保存路径
+    // m_settings->setValue("ToolBar/filePath", m_saveTextFilePath);
+
+    // 字体
+    m_settings->setValue("ShowWindow/font", ui->plainTextEdit_Show->font());
+
+    // 背景色
+    m_settings->setValue("ShowWindow/bgColor",
+                         ui->plainTextEdit_Show->palette().color(QPalette::Base));
+
+    // 停靠窗口可见性
+    m_settings->setValue("ToolBar/dockVisible", ui->actDockVisible->isChecked());
+
+    // tab 页面索引
+    // m_settings->setValue("TabWidget/tabIndex", ui->tabWidget->currentIndex());
+
+    // 自定义项
+    saveCustomItem();
+}
+
 /// 设置串口配置
 void MainWindow::comPortSetting()
 {
-    m_comPort->setFlowControl(QSerialPort::NoFlowControl);
+    m_comPort->setBaudRate(m_standardBaudRates.at(m_baudRateIndex));
+    m_comPort->setDataBits(m_serialConfig.dataBits);
+    m_comPort->setStopBits(m_serialConfig.stopBits);
+    m_comPort->setParity(m_serialConfig.parity);
+    m_comPort->setFlowControl(m_serialConfig.flowControl);
 }
 
-/**
- * @brief 发送数据结尾自动加校验
- */
-void MainWindow::appendCheckData(QByteArray &sendBuf)
+void MainWindow::sendData(QString &content, SendModel model)
 {
-    int curIndex = ui->cbBox_DataCheck->currentIndex();
-    if(curIndex == CheckDataIndex::NONE_CHECK)
+    if(!m_comPort->isOpen()){
+        labelInfoRefresh("串口未打开，发送失败");
         return;
-    else if(curIndex == CheckDataIndex::MODBUS_CRC16){
-        appendModbusCRC16(sendBuf);
     }
-    else if(curIndex == CheckDataIndex::ADD8){
-        appendAdd8(sendBuf);
+
+    QByteArray sendBuf;
+
+    if (model == ASCII){
+        if(ui->ckBox_Addn->isChecked())
+            content.append("\r\n");
+        /// UTF8 或 Local8Bit
+        sendBuf = content.toLocal8Bit();
     }
+    else if(model == HEX){
+        /// 去掉所有空格
+        content.remove(" ");
+        /// 过滤掉 0-9、A-F、a-f 以外的所有非法字符
+        content.remove(QRegularExpression("[^0-9a-fA-F]"));
+        sendBuf = QByteArray::fromHex(content.toUtf8());
+        /// 加校验
+        appendCheckData(sendBuf);
+    }
+    if (sendBuf.isEmpty()) {
+        labelInfoRefresh("发送内容不能为空");
+        return;
+    }
+
+    m_comPort->write(sendBuf);
+    /// 发送内容展示
+    showSendData(sendBuf);
+    labelInfoRefresh(QString("发送成功 %1 字节").arg(sendBuf.size()));
 }
 
 void MainWindow::showSendData(const QByteArray &sendBuf)
@@ -414,6 +633,22 @@ void MainWindow::labelInfoRefresh(const QString strInfo)
 {
     ui->label_Info->setText(strInfo);
     m_infoTimer->start(1000);
+}
+
+/**
+ * @brief 发送数据结尾自动加校验
+ */
+void MainWindow::appendCheckData(QByteArray &sendBuf)
+{
+    int curIndex = ui->cbBox_DataCheck->currentIndex();
+    if(curIndex == CheckDataIndex::NONE_CHECK)
+        return;
+    else if(curIndex == CheckDataIndex::MODBUS_CRC16){
+        appendModbusCRC16(sendBuf);
+    }
+    else if(curIndex == CheckDataIndex::ADD8){
+        appendAdd8(sendBuf);
+    }
 }
 
 void MainWindow::appendModbusCRC16(QByteArray &data)
@@ -449,5 +684,111 @@ void MainWindow::appendAdd8(QByteArray &data)
     data.append(static_cast<char>(sum));
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    saveConfig();
+    labelInfoRefresh("配置保存成功");
+    event->accept();
+}
+
+/***************** 封装发送模块 *****************/
+
+/// Modbus
+void MainWindow::on_btn_ModbusReadAdd_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusRedOn_clicked()
+{
+    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
+    QString cmd = m_modbus->LED_RED_ON();
+
+    if(!slaveAddress.isEmpty()){
+        m_modbus->setSlaveAddress(slaveAddress);
+    }
+
+    sendData(cmd, SendModel::HEX);
+}
+
+void MainWindow::on_btn_ModbusRedOff_clicked()
+{
+    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
+    QString cmd = m_modbus->LED_RED_OFF();
+    if(!slaveAddress.isEmpty()){
+        m_modbus->setSlaveAddress(slaveAddress);
+    }
 
 
+
+    sendData(cmd, SendModel::HEX);
+}
+
+void MainWindow::on_btn_ModbusRedToggle_clicked()
+{
+    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
+QString cmd = m_modbus->LED_RED_TOGGLE();
+    if(!slaveAddress.isEmpty()){
+        m_modbus->setSlaveAddress(slaveAddress);
+    }
+
+
+
+    sendData(cmd, SendModel::HEX);
+}
+
+
+void MainWindow::on_btn_ModbusGreenOn_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusGreenOff_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusGreenToggle_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusBlueOn_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusBlueOff_clicked()
+{
+
+}
+
+void MainWindow::on_btn_ModbusBlueToggle_clicked()
+{
+
+}
+
+void MainWindow::on_btn_DHT11ReadTemp_clicked()
+{
+
+}
+
+void MainWindow::on_btn_DHT11ReadHumi_clicked()
+{
+
+}
+
+void MainWindow::on_btn_DHT11ReadTH_clicked()
+{
+
+}
+
+void MainWindow::on_btn_RTCSetTime_clicked()
+{
+
+}
+
+void MainWindow::on_btn_RTCGetTime_clicked()
+{
+
+}

@@ -789,15 +789,13 @@
    <addaction name="actDockVisible"/>
    <addaction name="separator"/>
    <addaction name="actAdd"/>
-   <addaction name="actDel"/>
-   <addaction name="actAddComment"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>518</height>
+     <height>532</height>
     </size>
    </property>
    <property name="features">
@@ -832,7 +830,7 @@
         <enum>QTabWidget::TabShape::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_1">
         <attribute name="title">
@@ -853,6 +851,144 @@
          <string>Modbus</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_3">
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_2">
+           <property name="title">
+            <string>DHT11</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <widget class="QPushButton" name="btn_DHT11ReadTemp">
+              <property name="text">
+               <string>读温度</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_DHT11ReadHumi">
+              <property name="text">
+               <string>读湿度</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_DHT11ReadTH">
+              <property name="text">
+               <string>读温湿度</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0" rowspan="2">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>LED</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QPushButton" name="btn_ModbusRedOn">
+              <property name="text">
+               <string>红灯开</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusRedOff">
+              <property name="text">
+               <string>红灯关</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusRedToggle">
+              <property name="text">
+               <string>红灯翻转</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusGreenOn">
+              <property name="text">
+               <string>绿灯开</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusGreenOff">
+              <property name="text">
+               <string>绿灯关</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusGreenToggle">
+              <property name="text">
+               <string>绿灯翻转</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusBlueOn">
+              <property name="text">
+               <string>蓝灯开</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusBlueOff">
+              <property name="text">
+               <string>蓝灯关</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_ModbusBlueToggle">
+              <property name="text">
+               <string>蓝灯翻转</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>RTC</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QPushButton" name="btn_RTCSetTime">
+              <property name="text">
+               <string>时间校准</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_RTCGetTime">
+              <property name="text">
+               <string>读当前时间</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item row="0" column="0" colspan="2">
           <widget class="QWidget" name="widget_3" native="true">
            <property name="maximumSize">
@@ -879,9 +1015,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit">
+             <widget class="QLineEdit" name="lineEdit_SlaveAddress">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -894,14 +1030,14 @@
               </property>
               <property name="maximumSize">
                <size>
-                <width>30</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_LedRedOn_15">
+             <widget class="QPushButton" name="btn_ModbusReadAdd">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -913,146 +1049,21 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </widget>
          </item>
-         <item row="1" column="0" rowspan="2">
-          <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>LED</string>
+         <item row="3" column="1">
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn">
-              <property name="text">
-               <string>红灯开</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_2">
-              <property name="text">
-               <string>红灯关</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_3">
-              <property name="text">
-               <string>红灯翻转</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_4">
-              <property name="text">
-               <string>绿灯开</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_6">
-              <property name="text">
-               <string>绿灯关</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_5">
-              <property name="text">
-               <string>绿灯翻转</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_7">
-              <property name="text">
-               <string>蓝灯开</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_9">
-              <property name="text">
-               <string>蓝灯关</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_8">
-              <property name="text">
-               <string>蓝灯翻转</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>DHT11</string>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_10">
-              <property name="text">
-               <string>读温度</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_11">
-              <property name="text">
-               <string>读湿度</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_12">
-              <property name="text">
-               <string>读温湿度</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QGroupBox" name="groupBox_3">
-           <property name="title">
-            <string>RTC</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_13">
-              <property name="text">
-               <string>时间校准</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_LedRedOn_14">
-              <property name="text">
-               <string>读当前时间</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+          </spacer>
          </item>
         </layout>
        </widget>
