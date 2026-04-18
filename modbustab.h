@@ -56,7 +56,7 @@ public:
     QString RTC_GET_TIME();
 
 private:
-    QString m_slaveAddress;
+    QString add;
 };
 
 #define MODBUS_FUNC_READ_COILS          0x01    // 读线圈（输出IO）
