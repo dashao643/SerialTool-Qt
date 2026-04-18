@@ -88,10 +88,10 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     Ui::MainWindow *ui;
 
-private:
-    ModbusTab *m_modbus = new ModbusTab(this);
+/***************** 发送模块 *****************/
+public slots:
+    void on_lineEdit_SlaveAddress_textChanged(const QString &arg1);
 
-private slots:
     void on_btn_ModbusReadAdd_clicked();
     void on_btn_ModbusRedOn_clicked();
     void on_btn_ModbusRedOff_clicked();
@@ -107,6 +107,9 @@ private slots:
     void on_btn_DHT11ReadTH_clicked();
     void on_btn_RTCSetTime_clicked();
     void on_btn_RTCGetTime_clicked();
+
+private:
+    ModbusTab *m_modbus = new ModbusTab(this);
 
 };
 #endif // MAINWINDOW_H

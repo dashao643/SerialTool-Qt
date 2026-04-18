@@ -78,6 +78,9 @@ void MainWindow::uiInit()
     foreach(qint32 BaudRate,QSerialPortInfo::standardBaudRates()){
         ui->cbBox_PortBuad->addItem(QString::number(BaudRate));
     }
+
+    // 串口开关按钮 绿色
+    ui->btn_OpenClose->setStyleSheet("background-color: #aaff7f;");
 }
 
 /**
@@ -170,7 +173,7 @@ void MainWindow::loadConfig()
     }
 
     /// dock栏页面
-    // ui->tabWidget->setCurrentIndex(
+    ui->tabWidget->setCurrentIndex(SendProtocol::CUSTOM);
     //     m_settings->value("TabWidget/tabIndex", SendProtocol::CUSTOM).toInt());
 
     /// 自定义项和自定义数据
@@ -233,8 +236,8 @@ void MainWindow::do_btnOpenClose()
             return;
         }
         /// 按钮变红色
+        ui->btn_OpenClose->setStyleSheet("background-color: #f98a52;");
         ui->btn_OpenClose->setText("关闭串口");
-
         labelInfoRefresh(m_curPortName+"已打开");
         /// 打开此端口后，不能选择其他端口
         ui->cbBox_PortNum->setDisabled(true);
@@ -244,6 +247,7 @@ void MainWindow::do_btnOpenClose()
         m_comPort->close();
         // 关闭清空缓冲区
         m_receiveBuffer.clear();
+        ui->btn_OpenClose->setStyleSheet("background-color: #aaff7f;");
         ui->btn_OpenClose->setText("打开串口");
         labelInfoRefresh(m_curPortName+"已关闭");
         ui->cbBox_PortNum->setDisabled(false);
@@ -278,7 +282,10 @@ void MainWindow::do_showReceivedData()
     else if(ui->rdBtn_ShowHex->isChecked()){
         strReceive = m_receiveBuffer.toHex(' ').toUpper();;
     }
-    ui->plainTextEdit_Show->appendPlainText(QString("[%1]收←◆%2").arg(strTime, strReceive));
+    ui->plainTextEdit_Show->appendHtml(
+        QString("[%1]<span style='color:red'>收←◆%2</span>")
+            .arg(strTime, strReceive)
+    );
     // 清空缓冲区，等待下一包
     m_receiveBuffer.clear();
 }
@@ -626,7 +633,11 @@ void MainWindow::showSendData(const QByteArray &sendBuf)
     else if(ui->rdBtn_ShowHex->isChecked()){
         strSend = sendBuf.toHex(' ').toUpper();;
     }
-    ui->plainTextEdit_Show->appendPlainText(QString("[%1]发→◇%2").arg(strTime, strSend));
+    // 蓝色发送
+    ui->plainTextEdit_Show->appendHtml(
+        QString("[%1]<span style='color:blue'>发→◇%2</span>")
+            .arg(strTime, strSend)
+    );
 }
 
 void MainWindow::labelInfoRefresh(const QString strInfo)
@@ -691,7 +702,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-/***************** 封装发送模块 *****************/
+/***************** 发送模块 *****************/
 
 /// Modbus
 void MainWindow::on_btn_ModbusReadAdd_clicked()
@@ -699,96 +710,91 @@ void MainWindow::on_btn_ModbusReadAdd_clicked()
 
 }
 
+void MainWindow::on_lineEdit_SlaveAddress_textChanged(const QString &arg1)
+{
+    m_modbus->setSlaveAddress(arg1);
+}
+
 void MainWindow::on_btn_ModbusRedOn_clicked()
 {
-    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
     QString cmd = m_modbus->LED_RED_ON();
-
-    if(!slaveAddress.isEmpty()){
-        m_modbus->setSlaveAddress(slaveAddress);
-    }
-
     sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusRedOff_clicked()
 {
-    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
     QString cmd = m_modbus->LED_RED_OFF();
-    if(!slaveAddress.isEmpty()){
-        m_modbus->setSlaveAddress(slaveAddress);
-    }
-
-
-
     sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusRedToggle_clicked()
 {
-    QString slaveAddress = ui->lineEdit_SlaveAddress->text();
-QString cmd = m_modbus->LED_RED_TOGGLE();
-    if(!slaveAddress.isEmpty()){
-        m_modbus->setSlaveAddress(slaveAddress);
-    }
-
-
-
+    QString cmd = m_modbus->LED_RED_TOGGLE();
     sendData(cmd, SendModel::HEX);
 }
 
-
 void MainWindow::on_btn_ModbusGreenOn_clicked()
 {
-
+    QString cmd = m_modbus->LED_GREEN_ON();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusGreenOff_clicked()
 {
-
+    QString cmd = m_modbus->LED_GREEN_OFF();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusGreenToggle_clicked()
 {
-
+    QString cmd = m_modbus->LED_GREEN_TOGGLE();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusBlueOn_clicked()
 {
-
+    QString cmd = m_modbus->LED_BLUE_ON();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusBlueOff_clicked()
 {
-
+    QString cmd = m_modbus->LED_BLUE_OFF();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_ModbusBlueToggle_clicked()
 {
-
+    QString cmd = m_modbus->LED_BLUE_TOGGLE();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_DHT11ReadTemp_clicked()
 {
-
+    QString cmd = m_modbus->DHT11_READ_TEMP();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_DHT11ReadHumi_clicked()
 {
-
+    QString cmd = m_modbus->DHT11_READ_HUMI();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_DHT11ReadTH_clicked()
 {
-
+    QString cmd = m_modbus->DHT11_READ_TH();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_RTCSetTime_clicked()
 {
-
+    QString cmd = m_modbus->RTC_SET_TIME();
+    sendData(cmd, SendModel::HEX);
 }
 
 void MainWindow::on_btn_RTCGetTime_clicked()
 {
-
+    QString cmd = m_modbus->RTC_GET_TIME();
+    sendData(cmd, SendModel::HEX);
 }
