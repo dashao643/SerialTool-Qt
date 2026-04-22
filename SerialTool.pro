@@ -36,7 +36,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     res.qrc
 
-RC_ICONS = usb_blue.ico
+RC_ICONS = res\usb_blue.ico
 
 VERSION = 1.0.0
 

@@ -79,8 +79,7 @@ void MainWindow::uiInit()
         ui->cbBox_PortBuad->addItem(QString::number(BaudRate));
     }
 
-    // 串口开关按钮 绿色
-    ui->btn_OpenClose->setStyleSheet("background-color: #aaff7f;");
+    styleSheetUpdate();
 }
 
 /**
@@ -236,7 +235,7 @@ void MainWindow::do_btnOpenClose()
             return;
         }
         /// 按钮变红色
-        ui->btn_OpenClose->setStyleSheet("background-color: #f98a52;");
+        // ui->btn_OpenClose->setStyleSheet("background-color: #f98a52;");
         ui->btn_OpenClose->setText("关闭串口");
         labelInfoRefresh(m_curPortName+"已打开");
         /// 打开此端口后，不能选择其他端口
@@ -247,13 +246,13 @@ void MainWindow::do_btnOpenClose()
         m_comPort->close();
         // 关闭清空缓冲区
         m_receiveBuffer.clear();
-        ui->btn_OpenClose->setStyleSheet("background-color: #aaff7f;");
+        // ui->btn_OpenClose->setStyleSheet("background-color: #aaff7f;");
         ui->btn_OpenClose->setText("打开串口");
         labelInfoRefresh(m_curPortName+"已关闭");
         ui->cbBox_PortNum->setDisabled(false);
     }
     m_isPortOpen = !m_isPortOpen;
-
+    styleSheetUpdate();
     ui->actPortSetting->setDisabled(m_isPortOpen);
 }
 
@@ -286,6 +285,7 @@ void MainWindow::do_showReceivedData()
         QString("[%1]<span style='color:red'>收←◆%2</span>")
             .arg(strTime, strReceive)
     );
+    labelInfoRefresh(QString("接收了%1字节").arg(m_receiveBuffer.size()));
     // 清空缓冲区，等待下一包
     m_receiveBuffer.clear();
 }
@@ -410,6 +410,26 @@ void MainWindow::on_actAdd_triggered()
     });
 }
 
+void MainWindow::on_actInsert_triggered()
+{
+    int curRow = ui->listWidget->currentRow();
+    if(curRow < 0){
+        labelInfoRefresh("当前未选中");
+        return;
+    }
+    QListWidgetItem *insertItem = new QListWidgetItem;
+    CustomDataSendWidget *w = new CustomDataSendWidget;
+
+    ui->listWidget->insertItem(curRow,insertItem);
+    ui->listWidget->setItemWidget(insertItem, w);
+    insertItem->setSizeHint(QSize(0,60));
+    connect(w, &CustomDataSendWidget::sendDataRequest,this,
+            [=](const QString &content, SendModel model){
+                QString str = content;
+                sendData(str,model);
+    });
+}
+
 void MainWindow::on_actDel_triggered()
 {
     int row = ui->listWidget->currentRow();
@@ -459,6 +479,44 @@ void MainWindow::on_listWidget_customContextMenuRequested(const QPoint &pos)
     menuList->exec(QCursor::pos());
     /// 菜单显示完后，删除对象
     delete menuList;
+}
+
+void MainWindow::styleSheetUpdate()
+{
+    /************** btn_OpenClose **************/
+    // 当前串口是打开状态,红色
+    if(m_isPortOpen){
+        ui->btn_OpenClose->setStyleSheet(R"(
+            QPushButton{
+                background-color: #f98a52;
+                border-radius: 4px;
+                border: none;
+                padding:6px;
+            }
+            QPushButton:hover{
+                background-color: #fFAa72;
+            }
+            QPushButton:pressed{
+                background-color: #D96a32;
+            }
+        )");
+    }
+    else{
+        ui->btn_OpenClose->setStyleSheet(R"(
+        QPushButton {
+            background-color: #aaff7f;
+            border-radius: 4px;
+            border: none;
+            padding:6px;
+        }
+        QPushButton:hover{
+            background-color: #caff9f;
+        }
+        QPushButton:pressed{
+            background-color: #8adf5f;
+        }
+        )");
+    }
 }
 
 /**
@@ -798,3 +856,6 @@ void MainWindow::on_btn_RTCGetTime_clicked()
     QString cmd = m_modbus->RTC_GET_TIME();
     sendData(cmd, SendModel::HEX);
 }
+
+
+

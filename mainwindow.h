@@ -66,6 +66,7 @@ private slots:
     void on_actDockFloat_triggered(bool checked);
     void on_actDockVisible_triggered(bool checked);
     void on_actAdd_triggered();
+    void on_actInsert_triggered();
     void on_actDel_triggered();
 
     void on_cbBox_PortBuad_currentIndexChanged(int index);
@@ -73,6 +74,7 @@ private slots:
     void on_listWidget_customContextMenuRequested(const QPoint &pos);
 
 private:
+    void styleSheetUpdate();
     void loadCustomItem();
     void saveCustomItem();
     void saveConfig();

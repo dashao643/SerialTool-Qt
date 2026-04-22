@@ -789,6 +789,7 @@
    <addaction name="actDockVisible"/>
    <addaction name="separator"/>
    <addaction name="actAdd"/>
+   <addaction name="actInsert"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
@@ -1222,15 +1223,15 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actAddComment">
+  <action name="actInsert">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::MailAttachment"/>
    </property>
    <property name="text">
-    <string>添加注释</string>
+    <string>插入项</string>
    </property>
    <property name="toolTip">
-    <string>添加注释</string>
+    <string>插入项</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
