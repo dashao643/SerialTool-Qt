@@ -15,6 +15,7 @@
 #include <QListWidgetItem>
 #include <QMenu>
 #include <QDate>
+#include <QScrollBar>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -91,8 +92,13 @@ void MainWindow::slotsInit()
     connect(ui->btn_PortRefresh,&QPushButton::clicked,this,&MainWindow::do_cbBoxPortNumRefresh);
     connect(ui->btn_OpenClose,&QPushButton::clicked,this,&MainWindow::do_btnOpenClose);
     connect(ui->btn_Send,&QPushButton::clicked,this,&MainWindow::do_btnComSendData);
-    // 串口设备槽函数
+
+    // 串口有数据 -> 串口读数据
     connect(m_comPort,&QSerialPort::readyRead,this,&MainWindow::do_comReadyRead);
+
+    // textEdit 选中 -> 计算选中个数
+    connect(ui->plainTextEdit_Show,&QPlainTextEdit::selectionChanged,
+            this,&MainWindow::do_calSelCharCnt);
 
     /// Hex 发送时禁用自动换行
     connect(ui->rdBtn_SendHex, &QRadioButton::clicked, this, [=](bool checked){
@@ -288,6 +294,9 @@ void MainWindow::do_showReceivedData()
     labelInfoRefresh(QString("接收了%1字节").arg(m_receiveBuffer.size()));
     // 清空缓冲区，等待下一包
     m_receiveBuffer.clear();
+    // 显示区显示最后
+    QScrollBar *scrollBar = ui->plainTextEdit_Show->verticalScrollBar();
+    scrollBar->setValue(scrollBar->maximum());
 }
 
 /**
@@ -302,6 +311,19 @@ void MainWindow::do_btnComSendData()
         sendModel = ASCII;
     }
     sendData(content,sendModel);
+}
+
+// 计算鼠标选中区域的字符串数量
+void MainWindow::do_calSelCharCnt()
+{
+    // qDebug()<<"选中了"<<num++;
+    // 获取当前鼠标选中的文字
+    QString selectedText = ui->plainTextEdit_Show->textCursor().selectedText();
+    if(selectedText.isEmpty())
+        return;
+    // 按空格/换行分割，统计有效数据个数
+    QStringList list = selectedText.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+    labelInfoRefresh(QString("当前选中个数：%1").arg(list.size()));
 }
 
 // QAction槽函数
@@ -732,7 +754,8 @@ void MainWindow::appendModbusCRC16(QByteArray &data)
             if (crc & 1) {
                 crc >>= 1;
                 crc ^= 0xA001;
-            } else {
+            }
+            else {
                 crc >>= 1;
             }
         }

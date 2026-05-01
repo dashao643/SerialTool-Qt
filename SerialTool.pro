@@ -38,7 +38,7 @@ RESOURCES += \
 
 RC_ICONS = res\usb_blue.ico
 
-VERSION = 1.0.0
+VERSION = 1.0.2
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 # DEFINES += QT_NO_DEBUG_OUTPUT

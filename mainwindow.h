@@ -51,12 +51,14 @@ public:
     void slotsInit();
     void loadConfig();
 
+    int num = 0;
 private slots:
     void do_cbBoxPortNumRefresh();
     void do_btnOpenClose();
     void do_comReadyRead();
     void do_showReceivedData();
     void do_btnComSendData();
+    void do_calSelCharCnt();
 
     void on_actPortSetting_triggered();
     void on_actClear_triggered();
