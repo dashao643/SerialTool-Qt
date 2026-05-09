@@ -10,23 +10,31 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    customdatasendwidget.cpp \
+    appconfig.cpp \
+    customitem.cpp \
     main.cpp \
     mainwindow.cpp \
-    modbustab.cpp \
-    serialsettingdialog.cpp
+    sendfiledialog.cpp \
+    serialmanager.cpp \
+    serialsettingdialog.cpp \
+    tabpage.cpp
 
 HEADERS += \
-    customdatasendwidget.h \
+    appconfig.h \
+    customitem.h \
     dataStructure.h \
     mainwindow.h \
-    modbustab.h \
-    serialsettingdialog.h
+    sendfiledialog.h \
+    serialmanager.h \
+    serialsettingdialog.h \
+    tabpage.h
 
 FORMS += \
-    customdatasendwidget.ui \
+    customitem.ui \
     mainwindow.ui \
-    serialsettingdialog.ui
+    sendfiledialog.ui \
+    serialsettingdialog.ui \
+    tabpage.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -34,11 +42,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    res.qrc
+    resource.qrc
 
-RC_ICONS = res\usb_blue.ico
+RC_ICONS = resource\usb_blue.ico
 
-VERSION = 1.0.2
+VERSION = 1.1.0
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 # DEFINES += QT_NO_DEBUG_OUTPUT
+
+DISTFILES +=

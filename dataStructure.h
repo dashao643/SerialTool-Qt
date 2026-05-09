@@ -2,8 +2,10 @@
 #define DATASTRUCTURE_H
 
 #include <QSerialPort>
+#include <QSize>
+#include <QFont>
 
-// 所有公共数据结构定义
+// 公共数据结构定义
 
 typedef enum{
     HEX = 0,
@@ -16,19 +18,43 @@ typedef enum{
     ADD8,
 }CheckDataIndex;
 
-typedef enum{
-    CUSTOM = 0,
-    MODBUS,
-    ESP8266,
-}SendProtocol;
-
 typedef struct{
-    QSerialPort::DataBits dataBits;
-    QSerialPort::StopBits stopBits;
-    QSerialPort::Parity parity;
+    QSerialPort::DataBits    dataBits;
+    QSerialPort::StopBits    stopBits;
+    QSerialPort::Parity      parity;
     QSerialPort::FlowControl flowControl;
 }SerialConfigStruct;
 
+typedef struct
+{
+    QString remark;
+    QString content;
+    SendModel model;
+}ItemConfig;
 
+typedef struct{
+    QString filePath;
+    int dataSize;
+    QString cmd;
+    QString ack;
+    int timeoutMs;
+    int model;
+} SendFile_t;
+
+typedef struct
+{
+    QString name;
+    QList<ItemConfig> items;
+}TabPageConfig;
+
+typedef struct{
+    QSize windowSize;
+    int baudRateIndex;
+    CheckDataIndex check;
+    QString filePath;
+    QFont font;
+    bool isDockVisible;
+    SendFile_t sendFile;
+} Config_t;
 
 #endif // DATASTRUCTURE_H

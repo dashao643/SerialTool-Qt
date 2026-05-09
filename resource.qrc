@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resource/usb_blue.ico</file>
+        <file>resource/download.ico</file>
+    </qresource>
+</RCC>
