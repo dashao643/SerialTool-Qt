@@ -3,6 +3,7 @@
 
 #include "appconfig.h"
 #include "serialmanager.h"
+#include "sendfiledialog.h"
 
 #include <QMainWindow>
 #include <QTimer>
@@ -58,7 +59,7 @@ private slots:
     void do_showReceivedData();
     void do_calSelCharCnt();
     void do_addItemToList(int row = 0, bool isInsert = false);
-    void do_fileDownload(const SendFile_t &sendFile);
+    void do_fileDownload(const SendFile_t &sendFile, SendFileDialog* dialog);
 
     void on_btn_Send_clicked();
     void on_rdBtn_ShowASCII_clicked();

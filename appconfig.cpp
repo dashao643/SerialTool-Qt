@@ -49,6 +49,12 @@ void AppConfig::saveConfig(const Config_t &config)
     setting_.setValue("ToolBar/filePath",config.filePath);
     setting_.setValue("ShowWindow/font", config.font);
     setting_.setValue("ToolBar/dockVisible", config.isDockVisible);
+
+    setting_.setValue("ToolBar/send/filePath", config.sendFile.filePath);
+    setting_.setValue("ToolBar/send/dataSize", config.sendFile.dataSize);
+    setting_.setValue("ToolBar/send/cmd",config.sendFile.cmd);
+    setting_.setValue("ToolBar/send/ack",config.sendFile.ack);
+    setting_.setValue("ToolBar/send/timeoutMs", config.sendFile.timeoutMs);
 }
 
 QList<TabPageConfig> AppConfig::loadTabPage()

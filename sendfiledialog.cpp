@@ -46,6 +46,11 @@ SendFile_t SendFileDialog::getConfig() const
     return cfg;
 }
 
+void SendFileDialog::setProgress(int value)
+{
+    ui->progressBar->setValue(value);
+}
+
 void SendFileDialog::on_btn_OpenFile_clicked()
 {
     QString name = QFileDialog::getOpenFileName(this, "选择文件", config_.filePath,

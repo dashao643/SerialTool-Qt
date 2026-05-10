@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "customitem.h"
 #include "serialsettingdialog.h"
-#include "sendfiledialog.h"
 
 #include <QInputDialog>
 #include <QMenu>
@@ -14,7 +13,6 @@
 #include <QFontDialog>
 #include <QColorDialog>
 #include <QThread>
-#include <QProgressDialog>
 #include <QElapsedTimer>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -126,7 +124,9 @@ void MainWindow::slotsInit()
     connect(ui->actSendFile,&QAction::triggered,this,[=](){
         sendFile_.model = ui->cbBox_Model->currentIndex();
         SendFileDialog dialog(sendFile_, this);
-        connect(&dialog,&SendFileDialog::download,this,&MainWindow::do_fileDownload);
+        connect(&dialog,&SendFileDialog::download,this,[=, &dialog](const SendFile_t& cfg){
+            do_fileDownload(cfg, &dialog);
+        });
         dialog.exec();
         isFileDownload = false;
         sendFile_ = dialog.getConfig();
@@ -151,9 +151,9 @@ void MainWindow::loadPageConfig()
         for(int i = 0; i < page.items.count(); i++){
             do_addItemToList();
             // 获取刚刚创建的项
-            auto* item = list->item(i);
-            auto* customItem = qobject_cast<CustomItem*>(list->itemWidget(item));
-            auto& cfg = page.items[i];
+            QListWidgetItem* item = list->item(i);
+            CustomItem* customItem = qobject_cast<CustomItem*>(list->itemWidget(item));
+            ItemConfig& cfg = page.items[i];
             customItem->setRemark(cfg.remark);
             customItem->setContent(cfg.content);
             customItem->setModel(cfg.model);
@@ -278,7 +278,7 @@ bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
     QByteArray targetAck = QByteArray::fromHex(ackStr.toUtf8());
 
     while (timer.elapsed() < timeoutMs) {
-        // 让程序继续处理事件（串口、UI、定时器）
+        // 让界面 & 串口接收正常运行
         QCoreApplication::processEvents();
 
         // 检查是否收到正确 ACK
@@ -515,7 +515,7 @@ void MainWindow::do_addItemToList(int row, bool isInsert)
     connect(addItem, &CustomItem::sendDataRequest,this,&MainWindow::sendData);
 }
 
-void MainWindow::do_fileDownload(const SendFile_t &config)
+void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialog)
 {
     if(sendFile_.model == 0 && !serialManager_->isPortOpen_){
         QMessageBox::information(this,"提示","串口未开启");
@@ -535,19 +535,18 @@ void MainWindow::do_fileDownload(const SendFile_t &config)
         QMessageBox::critical(this,"提示","文件打开失败");
         return;
     }
-    // 阻塞式写法
     QByteArray content = file.readAll();
     file.close();
 
+    // 阻塞式写法
     // 先发送握手命令
     isFileDownload = true;
     fileReceiveBuffer_.clear();
-    sendData(config.cmd);
+    sendData(config.cmd, HEX);
 
     bool ackOK = waitAck(config.ack, config.timeoutMs);
     if (!ackOK) {
         QMessageBox::information(this,"提示","握手超时");
-        isFileDownload = false;
         return;
     }
 
@@ -560,24 +559,22 @@ void MainWindow::do_fileDownload(const SendFile_t &config)
         int len = qMin(packSize, totalSize - sent);
         QByteArray pack = content.mid(sent, len);
 
-        // 发送（文件发送 → 不加校验）
-        isFileDownload = true;
+        // 不走sendData
         serialManager_->sendData(pack);
         showSendData(pack);
-        isFileDownload = false;
 
         // 等待 ACK
         if (!waitAck(config.ack, config.timeoutMs)) {
-            labelInfoRefresh("等待 ACK 超时，发送失败");
+            QMessageBox::information(this,"提示","分包ACK超时");
             break;
         }
         sent += len;
+        dialog->setProgress(sent);
     }
-    isFileDownload = false;
-    fileReceiveBuffer_.clear();
+    dialog->setProgress(totalSize);
+    QMessageBox::information(this,"完成","文件发送成功!");
 
-    QScrollBar *scrollBar = ui->plainTextEdit_Show->verticalScrollBar();
-    scrollBar->setValue(scrollBar->maximum());
+    fileReceiveBuffer_.clear();
 }
 
 void MainWindow::on_actDelTab_triggered()
@@ -640,6 +637,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     config.isDockVisible = ui->dockWidget->isVisible();
     config.font = ui->plainTextEdit_Show->font();
 
+    config.sendFile = sendFile_;
     appConfig_->saveConfig(config);
 
     appConfig_->saveTabPage(ui->tabWidget);

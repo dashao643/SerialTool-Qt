@@ -18,6 +18,7 @@ public:
     explicit SendFileDialog(SendFile_t sendFileConfig, QWidget *parent = nullptr);
     ~SendFileDialog();
     SendFile_t getConfig() const;
+    void setProgress(int value);
 
 signals:
     void download(const SendFile_t &sendFile_);

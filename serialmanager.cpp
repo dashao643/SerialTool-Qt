@@ -23,13 +23,6 @@ void SerialManager::slotsInit()
 {
     connect(this,&SerialManager::serialStateChanged,[=](bool isOpen){
         isPortOpen_ = isOpen;
-        if(isOpen){
-            // serialPort_->open()
-            // serialPort_->errorString();
-        }
-        else{
-            serialPort_->close();
-        }
     });
 }
 
