@@ -3,6 +3,7 @@
 
 #include "appconfig.h"
 #include "serialmanager.h"
+#include "networkmanager.h"
 #include "sendfiledialog.h"
 
 #include <QMainWindow>
@@ -40,6 +41,7 @@ public:
 private:
     AppConfig *appConfig_;
     SerialManager *serialManager_;
+    NetworkManager *networkManager_;
     bool isFileDownload = false;
     QByteArray fileReceiveBuffer_;
     Ui::MainWindow *ui;
@@ -75,5 +77,9 @@ private slots:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+
+private slots:
+    void on_toolBar_customContextMenuRequested(const QPoint &pos);
+    void on_actTimeSyn_triggered();
 };
 #endif // MAINWINDOW_H

@@ -37,6 +37,7 @@ void MainWindow::dataInit()
 {
     appConfig_ = new AppConfig(this);
     serialManager_ = new SerialManager(this);
+    networkManager_ = new NetworkManager(this);
 
     infoTimer_ = new QTimer(this);
     infoTimer_->setSingleShot(true);
@@ -57,6 +58,8 @@ void MainWindow::uiInit()
     serialManager_->do_btnPortRefresh(ui->cbBox_PortNum);
     // 初始化标准串口波特率
     serialManager_->baudRateInit(ui->cbBox_PortBuad);
+    // 初始化本地IP
+    networkManager_->ipInit(ui->cbBox_LocalIP);
     ui->tabWidget->clear();
     loadPageConfig();
     ui->tabWidget->setCurrentIndex(0);
@@ -77,7 +80,7 @@ void MainWindow::uiInit()
 void MainWindow::slotsInit()
 {
     // 标签栏提示
-    connect(infoTimer_,&QTimer::timeout,ui->label_Info,&QLabel::clear);
+    connect(infoTimer_,&QTimer::timeout,ui->label_InfoL,&QLabel::clear);
     connect(serialManager_,&SerialManager::labelShowInfo,this,&MainWindow::labelInfoRefresh);
     // 消息框提示
     connect(serialManager_,&SerialManager::showMessage,[=](const QString &string){
@@ -164,8 +167,11 @@ void MainWindow::loadPageConfig()
 // 信号槽绑定的参数，要么传值，要么传 const + 引用
 void MainWindow::sendData(QString content, SendModel model)
 {
+    if(content.isEmpty()){
+        labelInfoRefresh("发送内容不能为空");
+        return;
+    }
     QByteArray sendBuf;
-
     if (model == ASCII){
         if(ui->ckBox_Addn->isChecked())
             content.append("\r\n");
@@ -177,15 +183,13 @@ void MainWindow::sendData(QString content, SendModel model)
         content.remove(" ");
         /// 过滤掉 0-9、A-F、a-f 以外的所有非法字符
         content.remove(QRegularExpression("[^0-9a-fA-F]"));
+        if (content.isEmpty()) {
+            QMessageBox::information(this,"提示","请输入合法Hex数");
+            return;
+        }
         sendBuf = QByteArray::fromHex(content.toUtf8());
-        if(!isFileDownload)
-            appendCheckData(sendBuf);
+        appendCheckData(sendBuf);
     }
-    if (sendBuf.isEmpty()) {
-        labelInfoRefresh("发送内容不能为空");
-        return;
-    }
-
     // 串口发送
     if(ui->cbBox_Model->currentIndex() == 0){
         serialManager_->sendData(sendBuf);
@@ -219,7 +223,7 @@ void MainWindow::showSendData(const QByteArray &sendBuf)
 
 void MainWindow::labelInfoRefresh(const QString strInfo)
 {
-    ui->label_Info->setText(strInfo);
+    ui->label_InfoL->setText(strInfo);
     infoTimer_->start(LABEL_INFO_SHOW_MS);
 }
 
@@ -274,7 +278,6 @@ bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
 {
     QElapsedTimer timer;
     timer.start();
-
     QByteArray targetAck = QByteArray::fromHex(ackStr.toUtf8());
 
     while (timer.elapsed() < timeoutMs) {
@@ -286,10 +289,7 @@ bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
             fileReceiveBuffer_.clear();
             return true;
         }
-
-        QThread::msleep(5);
     }
-
     return false;
 }
 
@@ -297,7 +297,9 @@ bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
 void MainWindow::do_UiUpdate(bool isSerialOpen)
 {
     if(isSerialOpen){
-        ui->btn_OpenClose->setText("关闭串口");
+        ui->btn_OpenClose->setText("关闭");
+        if(ui->cbBox_Model->)
+        ui->label_InfoR->setText("当前状态：串口开启");
         ui->btn_OpenClose->setStyleSheet(R"(
             QPushButton{
                 background-color: #f98a52;
@@ -314,7 +316,8 @@ void MainWindow::do_UiUpdate(bool isSerialOpen)
         )");
     }
     else{
-        ui->btn_OpenClose->setText("打开串口");
+        ui->btn_OpenClose->setText("开启");
+        ui->label_InfoR->setText("当前状态：关闭");
         ui->btn_OpenClose->setStyleSheet(R"(
         QPushButton {
             background-color: #aaff7f;
@@ -388,6 +391,10 @@ void MainWindow::do_calSelCharCnt()
 void MainWindow::on_btn_Send_clicked()
 {
     QString content = ui->plainTextEdit_Send->toPlainText();
+    if(content.isEmpty()){
+        labelInfoRefresh("发送内容不能为空");
+        return;
+    }
     SendModel sendModel = HEX;
 
     if (ui->rdBtn_SendASCII->isChecked()){
@@ -414,8 +421,8 @@ void MainWindow::on_rdBtn_ShowASCII_clicked()
 
     if (selected.isEmpty()) return;
 
-    QByteArray hexBytes = selected.toUtf8();
-    QString ascii = QString::fromLocal8Bit(hexBytes);
+    QByteArray binData = QByteArray::fromHex(selected.toUtf8());
+    QString ascii = QString::fromLocal8Bit(binData);
 
     cursor.insertText(ascii);
 
@@ -537,16 +544,16 @@ void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialo
     }
     QByteArray content = file.readAll();
     file.close();
+    QProgressBar *progressBar = dialog->getProgress();
+    progressBar->setMaximum(content.size());
 
-    // 阻塞式写法
-    // 先发送握手命令
-    isFileDownload = true;
+    // 阻塞式写法。先发送握手命令，附带校验
     fileReceiveBuffer_.clear();
+    isFileDownload = true;
     sendData(config.cmd, HEX);
-
     bool ackOK = waitAck(config.ack, config.timeoutMs);
     if (!ackOK) {
-        QMessageBox::information(this,"提示","握手超时");
+        QMessageBox::critical(this,"提示","握手超时，升级失败");
         return;
     }
 
@@ -555,26 +562,23 @@ void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialo
     int packSize = config.dataSize;
 
     while (sent < totalSize) {
-        // 取一包
         int len = qMin(packSize, totalSize - sent);
         QByteArray pack = content.mid(sent, len);
-
-        // 不走sendData
+        // 最后一包长度不足，用 0xFF 填充
+        if (pack.size() < packSize) {
+            pack.append(packSize - pack.size(), (uint8_t)0xFF);
+        }
         serialManager_->sendData(pack);
         showSendData(pack);
 
-        // 等待 ACK
         if (!waitAck(config.ack, config.timeoutMs)) {
-            QMessageBox::information(this,"提示","分包ACK超时");
-            break;
+            QMessageBox::critical(this,"提示","ACK超时，升级失败");
+            return;
         }
         sent += len;
-        dialog->setProgress(sent);
+        progressBar->setValue(sent);
     }
-    dialog->setProgress(totalSize);
     QMessageBox::information(this,"完成","文件发送成功!");
-
-    fileReceiveBuffer_.clear();
 }
 
 void MainWindow::on_actDelTab_triggered()
@@ -642,3 +646,33 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     appConfig_->saveTabPage(ui->tabWidget);
 }
+
+void MainWindow::on_toolBar_customContextMenuRequested(const QPoint &pos)
+{
+    QString tabName = ui->tabWidget->tabText(0);
+    ui->actTimeSyn->setEnabled(tabName == "modbus");
+
+    QPoint globalPos = ui->toolBar->mapToGlobal(pos);
+    QMenu menu;
+    menu.addAction(ui->actTimeSyn);
+    menu.exec(globalPos);
+}
+
+void MainWindow::on_actTimeSyn_triggered()
+{
+    auto toHex2 = [](int val) {
+        return QString("%1").arg(val, 2, 16, QChar('0')).toUpper();
+    };
+    QString year   = toHex2(QDate::currentDate().year() % 100);
+    QString month  = toHex2(QDate::currentDate().month());
+    QString day    = toHex2(QDate::currentDate().day());
+    QString hour   = toHex2(QTime::currentTime().hour());
+    QString minute = toHex2(QTime::currentTime().minute());
+    QString second = toHex2(QTime::currentTime().second());
+    // qDebug()<<year << month << day;
+    // qDebug()<<hour << minute << second;
+    sendData("01 10 00 01 00 06 06"+year+month+day+hour+minute+second,HEX);
+         // %1 %2 %3 %4 %5 %6")
+         //     .arg(year).arg(month).arg(day).arg(hour).arg(minute).arg(second),HEX);
+}
+

@@ -13,6 +13,8 @@ SendFileDialog::SendFileDialog(SendFile_t sendFileConfig, QWidget *parent)
     this->setWindowTitle("文件传输");
     qDebug()<<this->width()<<" "<<this->height();
 
+    ui->lineEdit_Ack->setMaxLength(2);
+
     config_ = sendFileConfig;
     if(config_.model == 0)
         ui->label_SendModel->setText("串口传输");
@@ -46,9 +48,9 @@ SendFile_t SendFileDialog::getConfig() const
     return cfg;
 }
 
-void SendFileDialog::setProgress(int value)
+QProgressBar *SendFileDialog::getProgress()
 {
-    ui->progressBar->setValue(value);
+    return ui->progressBar;
 }
 
 void SendFileDialog::on_btn_OpenFile_clicked()

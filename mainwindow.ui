@@ -65,7 +65,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <property name="spacing">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="leftMargin">
         <number>5</number>
@@ -74,7 +74,7 @@
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
@@ -83,7 +83,7 @@
         <widget class="QComboBox" name="cbBox_Model">
          <property name="minimumSize">
           <size>
-           <width>50</width>
+           <width>75</width>
            <height>24</height>
           </size>
          </property>
@@ -105,6 +105,32 @@
         </widget>
        </item>
        <item>
+        <widget class="Line" name="line_8">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_OpenClose">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>开启</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="frameShape">
           <enum>QFrame::Shape::NoFrame</enum>
@@ -116,23 +142,10 @@
           <number>0</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="pageSerial">
           <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QPushButton" name="btn_OpenClose">
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>打开串口</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="Line" name="line_5">
              <property name="orientation">
@@ -242,7 +255,185 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="pageNetwork"/>
+         <widget class="QWidget" name="pageNetwork">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="Line" name="line_10">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cbBox_Network">
+             <property name="minimumSize">
+              <size>
+               <width>85</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>85</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>TCP服务端</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TCP客户端</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>UDP</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line_9">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>本地：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cbBox_LocalIP">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>24</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>本地IP</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_LocalPort">
+             <property name="minimumSize">
+              <size>
+               <width>42</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>65535</string>
+             </property>
+             <property name="maxLength">
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line_11">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>远程：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_RemoteIP">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>192.168.31.155</string>
+             </property>
+             <property name="maxLength">
+              <number>15</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_RemotePort">
+             <property name="minimumSize">
+              <size>
+               <width>42</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>65535</string>
+             </property>
+             <property name="maxLength">
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="pageBluetooth"/>
         </widget>
        </item>
@@ -290,11 +481,14 @@
            <height>25</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::Panel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Shadow::Plain</enum>
          </property>
          <property name="text">
           <string>数据发送：</string>
@@ -393,9 +587,15 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>115</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>115</width>
            <height>16777215</height>
           </size>
          </property>
@@ -531,7 +731,7 @@
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::Panel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Shadow::Raised</enum>
@@ -601,7 +801,7 @@
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::Panel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Shadow::Raised</enum>
@@ -680,7 +880,7 @@
         <height>100</height>
        </size>
       </property>
-      <layout class="QGridLayout" name="gridLayout" columnstretch="5,0">
+      <layout class="QGridLayout" name="gridLayout" columnstretch="5,0,0">
        <property name="leftMargin">
         <number>5</number>
        </property>
@@ -696,28 +896,21 @@
        <property name="horizontalSpacing">
         <number>5</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_Info">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-         </property>
-        </widget>
+       <item row="0" column="0" colspan="3">
+        <widget class="QPlainTextEdit" name="plainTextEdit_Send"/>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QPushButton" name="btn_Send">
          <property name="minimumSize">
           <size>
            <width>0</width>
            <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>75</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="text">
@@ -728,8 +921,34 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QPlainTextEdit" name="plainTextEdit_Send"/>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_InfoL">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>350</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_InfoR">
+         <property name="text">
+          <string>TextLabel_R</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -737,8 +956,14 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="contextMenuPolicy">
+    <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>20</number>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
@@ -818,6 +1043,9 @@
           <widget class="QListWidget" name="listWidget1">
            <property name="contextMenuPolicy">
             <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LayoutDirection::LeftToRight</enum>
            </property>
           </widget>
          </item>
@@ -1009,6 +1237,23 @@
    </property>
    <property name="toolTip">
     <string>文件传输</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actTimeSyn">
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DialogWarning"/>
+   </property>
+   <property name="text">
+    <string>时间同步</string>
+   </property>
+   <property name="toolTip">
+    <string>时间同步</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

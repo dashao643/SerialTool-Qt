@@ -8,6 +8,12 @@
 // 公共数据结构定义
 
 typedef enum{
+    SERIAL = 0,
+    NETWORK,
+    BLUETOOTH
+}ComModel;
+
+typedef enum{
     HEX = 0,
     ASCII,
 }SendModel;

@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += serialport
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,6 +15,7 @@ SOURCES += \
     customitem.cpp \
     main.cpp \
     mainwindow.cpp \
+    networkmanager.cpp \
     sendfiledialog.cpp \
     serialmanager.cpp \
     serialsettingdialog.cpp \
@@ -24,6 +26,7 @@ HEADERS += \
     customitem.h \
     dataStructure.h \
     mainwindow.h \
+    networkmanager.h \
     sendfiledialog.h \
     serialmanager.h \
     serialsettingdialog.h \
@@ -51,5 +54,3 @@ VERSION = 1.1.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 # DEFINES += QT_NO_DEBUG_OUTPUT
-
-DISTFILES +=

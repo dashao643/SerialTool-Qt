@@ -4,6 +4,7 @@
 #include "dataStructure.h"
 
 #include <QDialog>
+#include <QProgressBar>
 
 namespace Ui {
 class SendFileDialog;
@@ -18,7 +19,7 @@ public:
     explicit SendFileDialog(SendFile_t sendFileConfig, QWidget *parent = nullptr);
     ~SendFileDialog();
     SendFile_t getConfig() const;
-    void setProgress(int value);
+    QProgressBar* getProgress(void);
 
 signals:
     void download(const SendFile_t &sendFile_);
