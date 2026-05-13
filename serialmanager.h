@@ -12,30 +12,34 @@ class SerialManager : public QObject
 {
     Q_OBJECT
 public:
-    QSerialPort *serialPort_;
-    bool isPortOpen_ = false;
     SerialConfigStruct serialConfig_;                      // 串口其他配置
 
     explicit SerialManager(QObject *parent = nullptr);
-    void dataInit();
-    void slotsInit();
-    void baudRateInit(QComboBox *comboBox);
 
+    void baudRateInit(QComboBox *comboBox);
+    bool isOpen() const { return isPortOpen_; }
     void sendData(const QByteArray &content);
-    void setBuadRate(QComboBox *comboBox, int index);
+    void setBuadRate(int buadRate);
+    void closeConnection();
 
 public slots:
     void do_btnPortRefresh(QComboBox *comboBox);
-    void do_btnOpenClose(QComboBox *comboBoxPort, const QComboBox *comboBoxBuadRate);
+    void do_btnOpenClose(QComboBox *comboBoxPort);
 
 signals:
-    void serialStateChanged(bool isOpen);
-    void availablePort(bool isEmpty);
-    void labelShowInfo(const QString& text);
-    void showMessage(const QString& text);
+    void sgn_serialStateChanged(bool isOpen);
+    void sgn_availablePort(bool isEmpty);
+    void sgn_labelShowInfo(const QString& text);
+    void sgn_showMessage(const QString& text);
+    void sgn_readyRead(const QByteArray &byteArray);
 
 private:
-    void comPortSetting(const QComboBox *comboBoxBuadRate);
+    QSerialPort *serialPort_;
+    bool isPortOpen_ = false;
+
+    void dataInit();
+    void slotsInit();
+    void comPortSetting();
 
 private slots:
 };

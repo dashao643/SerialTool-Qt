@@ -21,8 +21,8 @@ void SerialManager::dataInit()
 
 void SerialManager::slotsInit()
 {
-    connect(this,&SerialManager::serialStateChanged,[=](bool isOpen){
-        isPortOpen_ = isOpen;
+    connect(serialPort_,&QSerialPort::readyRead,[=](){
+        sgn_readyRead(serialPort_->readAll());
     });
 }
 
@@ -36,7 +36,7 @@ void SerialManager::baudRateInit(QComboBox *comboBox)
 void SerialManager::sendData(const QByteArray &content)
 {
     if(!isPortOpen_){
-        emit showMessage("端口未开启");
+        emit sgn_showMessage("端口未开启");
         return;
     }
     serialPort_->write(content);
@@ -44,57 +44,67 @@ void SerialManager::sendData(const QByteArray &content)
 
 void SerialManager::do_btnPortRefresh(QComboBox *comboBox)
 {
+    // 先关闭已打开的端口，保证状态同步
+    closeConnection();
+
     comboBox->clear();
 
     foreach(QSerialPortInfo portInfo, QSerialPortInfo::availablePorts()){
         comboBox->addItem(portInfo.portName()+":"+portInfo.description());
     }
-    emit serialStateChanged(false);
-    emit availablePort(QSerialPortInfo::availablePorts().isEmpty());
-    emit labelShowInfo("端口刷新完成");
+    emit sgn_availablePort(QSerialPortInfo::availablePorts().isEmpty());
+    emit sgn_labelShowInfo("端口刷新完成");
 }
 
-void SerialManager::do_btnOpenClose(QComboBox *comboBoxPort, const QComboBox *comboBoxBuadRate)
+void SerialManager::do_btnOpenClose(QComboBox *comboBoxPort)
 {
     if(!isPortOpen_){
         int curSize = comboBoxPort->count();
         int curIndex = comboBoxPort->currentIndex();
         do_btnPortRefresh(comboBoxPort);
         if(curSize != comboBoxPort->count()){
-            emit showMessage("串口已更新，请重新选择");
+            emit sgn_showMessage("串口已更新，请重新选择");
             return;
         }
         comboBoxPort->setCurrentIndex(curIndex);
         QSerialPortInfo curPortInfo = QSerialPortInfo::availablePorts().at(curIndex);
         serialPort_->setPort(curPortInfo);
         /// 先配置，再打开端口
-        comPortSetting(comboBoxBuadRate);
+        comPortSetting();
         if(!serialPort_->open(QIODeviceBase::ReadWrite)){
-            emit showMessage("当前串口无法打开\n"
+            emit sgn_showMessage("当前串口无法打开\n"
                              "请检查串口是否被占用");
             return;
         }
-        emit labelShowInfo(curPortInfo.portName() + "已开启");
+        emit sgn_labelShowInfo(curPortInfo.portName() + "已开启");
     }
     else{
         serialPort_->close();
-        emit labelShowInfo(serialPort_->portName() + "已关闭");
+        emit sgn_labelShowInfo(serialPort_->portName() + "已关闭");
     }
 
     isPortOpen_ = !isPortOpen_;
-    emit serialStateChanged(isPortOpen_);
+    emit sgn_serialStateChanged(isPortOpen_);
 }
 
-void SerialManager::setBuadRate(QComboBox *comboBox, int index)
+void SerialManager::closeConnection()
 {
-    int buadRate = comboBox->itemText(index).toInt();
+    if (isPortOpen_) {
+        serialPort_->close();
+        isPortOpen_ = false;
+        emit sgn_serialStateChanged(false);
+        emit sgn_labelShowInfo(serialPort_->portName() + "已关闭");
+    }
+}
+
+void SerialManager::setBuadRate(int buadRate)
+{
     serialPort_->setBaudRate(buadRate);
-    emit labelShowInfo("波特率已修改:" + QString::number(buadRate));
+    emit sgn_labelShowInfo("波特率已修改:" + QString::number(buadRate));
 }
 
-void SerialManager::comPortSetting(const QComboBox *comboBoxBuadRate)
+void SerialManager::comPortSetting()
 {
-    serialPort_->setBaudRate(comboBoxBuadRate->currentText().toInt());
     serialPort_->setDataBits(serialConfig_.dataBits);
     serialPort_->setStopBits(serialConfig_.stopBits);
     serialPort_->setParity(serialConfig_.parity);

@@ -42,6 +42,7 @@ private:
     AppConfig *appConfig_;
     SerialManager *serialManager_;
     NetworkManager *networkManager_;
+    bool isConnected_ = false;
     bool isFileDownload = false;
     QByteArray fileReceiveBuffer_;
     Ui::MainWindow *ui;
@@ -57,12 +58,14 @@ private:
 
 private slots:
     void do_UiUpdate(bool isSerialOpen);
-    void do_serialReadyRead();
+    void do_netWorkStateUpdate(QAbstractSocket::SocketState state);
+    void do_readyRead(const QByteArray &byteArray);
     void do_showReceivedData();
     void do_calSelCharCnt();
     void do_addItemToList(int row = 0, bool isInsert = false);
     void do_fileDownload(const SendFile_t &sendFile, SendFileDialog* dialog);
 
+    void on_btn_OpenClose_clicked();
     void on_btn_Send_clicked();
     void on_rdBtn_ShowASCII_clicked();
     void on_actPortSetting_triggered();

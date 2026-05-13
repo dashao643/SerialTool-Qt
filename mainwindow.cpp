@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     dataInit();
     uiInit();
     slotsInit();
+    serialManager_->setBuadRate(ui->cbBox_PortBuad->currentText().toInt());
 }
 
 MainWindow::~MainWindow()
@@ -81,31 +82,45 @@ void MainWindow::slotsInit()
 {
     // 标签栏提示
     connect(infoTimer_,&QTimer::timeout,ui->label_InfoL,&QLabel::clear);
-    connect(serialManager_,&SerialManager::labelShowInfo,this,&MainWindow::labelInfoRefresh);
+    /**************************** serialManager ****************************/
+    connect(serialManager_,&SerialManager::sgn_labelShowInfo,this,&MainWindow::labelInfoRefresh);
     // 消息框提示
-    connect(serialManager_,&SerialManager::showMessage,[=](const QString &string){
+    connect(serialManager_,&SerialManager::sgn_showMessage,[=](const QString &string){
         QMessageBox::information(this, "提示", string);
     });
     // ui更新
-    connect(serialManager_,&SerialManager::serialStateChanged,this,&MainWindow::do_UiUpdate);
+    connect(serialManager_,&SerialManager::sgn_serialStateChanged,this,&MainWindow::do_UiUpdate);
     // 串口开关按键状态
-    connect(serialManager_,&SerialManager::availablePort,[=](bool isEmpty){
+    connect(serialManager_,&SerialManager::sgn_availablePort,[=](bool isEmpty){
         ui->btn_OpenClose->setDisabled(isEmpty);
     });
+    // 串口有数据 -> 串口读数据
+    connect(serialManager_,&SerialManager::sgn_readyRead,this,&MainWindow::do_readyRead);
     // 刷新端口
     connect(ui->btn_PortRefresh,&QPushButton::clicked,serialManager_,[=](){
         serialManager_->do_btnPortRefresh(ui->cbBox_PortNum);
     });
-    // 串口配置
-    connect(ui->btn_OpenClose,&QPushButton::clicked,this,[=](){
-        serialManager_->do_btnOpenClose(ui->cbBox_PortNum, ui->cbBox_PortBuad);
+    // connect(ui->btn_OpenClose,&QPushButton::clicked,this,[=](){
+
+    // });
+    /**************************** networkManager ****************************/
+    connect(networkManager_,&NetworkManager::sgn_stateChange,this,&MainWindow::do_netWorkStateUpdate);
+    connect(networkManager_,&NetworkManager::sgn_readyRead,this,&MainWindow::do_readyRead);
+    connect(networkManager_,&NetworkManager::sgn_btnStateChanged,this,&MainWindow::do_UiUpdate);
+    connect(networkManager_,&NetworkManager::sgn_showMessage,[=](const QString &string){
+        QMessageBox::information(this, "提示", string);
     });
+    // connect(ui->btn_OpenClose,&QPushButton::clicked,this,[=](){
+
+    // });
     // 选择模式
     connect(ui->cbBox_Model,&QComboBox::currentIndexChanged,this,[=](int index){
+        // 切换模式时关闭所有连接，避免冲突
+        serialManager_->closeConnection();
+        networkManager_->closeConnection();
+        // 界面显示变更
         ui->stackedWidget->setCurrentIndex(index);
     });
-    // 串口有数据 -> 串口读数据
-    connect(serialManager_->serialPort_,&QSerialPort::readyRead,this,&MainWindow::do_serialReadyRead);
     // 累计读出数据，经过超时时间，显示数据
     connect(rxTimer_, &QTimer::timeout, this, &MainWindow::do_showReceivedData);
     // textEdit 选中 -> 计算选中个数
@@ -135,8 +150,13 @@ void MainWindow::slotsInit()
         sendFile_ = dialog.getConfig();
     });
     // 波特率修改
-    connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](int index){
-        serialManager_->setBuadRate(ui->cbBox_PortBuad, index);
+    connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](){
+        serialManager_->setBuadRate(ui->cbBox_PortBuad->currentText().toInt());
+    });
+    // 服务端禁用远程ip设置
+    connect(ui->cbBox_Network,&QComboBox::currentIndexChanged,[=](int index){
+        ui->lineEdit_RemoteIP->setDisabled(index == 0);
+        ui->lineEdit_RemotePort->setDisabled(index == 0);
     });
 }
 
@@ -196,9 +216,9 @@ void MainWindow::sendData(QString content, SendModel model)
     }
     // 网络发送
     else if(ui->cbBox_Model->currentIndex() == 1){
-
+        networkManager_->sendData(sendBuf);
     }
-    if(!serialManager_->isPortOpen_)
+    if(!isConnected_)
         return;
     showSendData(sendBuf);
     labelInfoRefresh(QString("发送成功 %1 字节").arg(sendBuf.size()));
@@ -294,12 +314,17 @@ bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
 }
 
 // 更新所有有关串口开关状态的显示
-void MainWindow::do_UiUpdate(bool isSerialOpen)
+void MainWindow::do_UiUpdate(bool isOpen)
 {
-    if(isSerialOpen){
+    isConnected_ = isOpen;
+    if(isOpen){
         ui->btn_OpenClose->setText("关闭");
-        if(ui->cbBox_Model->)
-        ui->label_InfoR->setText("当前状态：串口开启");
+        if(ui->cbBox_Model->currentIndex() == ComModel::SERIAL)
+            ui->label_InfoR->setText("当前状态：串口开启");
+        else if(ui->cbBox_Model->currentIndex() == ComModel::NETWORK &&
+                 ui->cbBox_Network->currentIndex() == 0){
+            ui->label_InfoR->setText("网络状态：服务器监听中...");
+        }
         ui->btn_OpenClose->setStyleSheet(R"(
             QPushButton{
                 background-color: #f98a52;
@@ -333,21 +358,64 @@ void MainWindow::do_UiUpdate(bool isSerialOpen)
         }
         )");
     }
-    ui->cbBox_PortNum->setDisabled(isSerialOpen);
-    ui->actPortSetting->setDisabled(isSerialOpen);
-    ui->btn_Send->setEnabled(isSerialOpen);
+    ui->actPortSetting->setDisabled(isOpen);
+    ui->cbBox_PortNum->setDisabled(isOpen);
+    ui->btn_Send->setEnabled(isOpen);
 }
 
-void MainWindow::do_serialReadyRead()
+void MainWindow::on_btn_OpenClose_clicked()
 {
-    /// 先把数据读到缓冲区 append不会自动加换行，plainTextEdit显示会自动加
-    QByteArray tempData = serialManager_->serialPort_->readAll();
+    if(ui->cbBox_Model->currentIndex() == ComModel::SERIAL)
+        serialManager_->do_btnOpenClose(ui->cbBox_PortNum);
+    else if(ui->cbBox_Model->currentIndex() == ComModel::NETWORK){
+        // TCP服务端，传本地ip;TCP客户端、UDP传远程目标ip
+        CurNetworkModel model = (CurNetworkModel)ui->cbBox_Network->currentIndex();
+        QString ip;
+        quint16 port = 0;
+        if(model == TcpServer){
+            ip = ui->cbBox_LocalIP->currentText();
+            port = ui->lineEdit_LocalPort->text().toInt();
+        }
+        else{
+            ip = ui->lineEdit_RemoteIP->text();
+            port = ui->lineEdit_RemotePort->text().toInt();
+        }
+        networkManager_->do_btnOpenClose(model,ip,port);
+    }
+}
 
-    receiveBuffer_.append(tempData);
+void MainWindow::do_netWorkStateUpdate(QAbstractSocket::SocketState state)
+{
+    switch(state)
+    {
+    case QAbstractSocket::UnconnectedState:
+        if(ui->cbBox_Network->currentIndex() == 0)
+            ui->label_InfoR->setText("网络状态：已断开");
+        else if(ui->cbBox_Network->currentIndex() == 1)
+            ui->label_InfoR->setText("网络状态：连接失败");
+        break;
+    case QAbstractSocket::ConnectedState:
+        ui->label_InfoR->setText("网络状态：已连接");           break;
+    case QAbstractSocket::ClosingState:
+        ui->label_InfoR->setText("网络状态：正在关闭...");         break;
+    case QAbstractSocket::ListeningState:
+        ui->label_InfoR->setText("网络状态：监听中...");       break;
+    case QAbstractSocket::HostLookupState:
+        ui->label_InfoR->setText("网络状态：正在解析主机域名...");  break;
+    case QAbstractSocket::ConnectingState:
+        ui->label_InfoR->setText("连接中...");                break;
+    case QAbstractSocket::BoundState:
+        break;
+    }
+}
+
+void MainWindow::do_readyRead(const QByteArray &byteArray)
+{
+    receiveBuffer_.append(byteArray);
     rxTimer_->start(ui->spBox_Timeout->value());
 
     if (isFileDownload) {
-        fileReceiveBuffer_.append(tempData);
+        fileReceiveBuffer_.append(byteArray);
     }
 }
 
@@ -524,7 +592,7 @@ void MainWindow::do_addItemToList(int row, bool isInsert)
 
 void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialog)
 {
-    if(sendFile_.model == 0 && !serialManager_->isPortOpen_){
+    if(sendFile_.model == 0 && !serialManager_->isOpen()){
         QMessageBox::information(this,"提示","串口未开启");
         return;
     }
@@ -669,10 +737,6 @@ void MainWindow::on_actTimeSyn_triggered()
     QString hour   = toHex2(QTime::currentTime().hour());
     QString minute = toHex2(QTime::currentTime().minute());
     QString second = toHex2(QTime::currentTime().second());
-    // qDebug()<<year << month << day;
-    // qDebug()<<hour << minute << second;
-    sendData("01 10 00 01 00 06 06"+year+month+day+hour+minute+second,HEX);
-         // %1 %2 %3 %4 %5 %6")
-         //     .arg(year).arg(month).arg(day).arg(hour).arg(minute).arg(second),HEX);
-}
 
+    sendData("01 10 00 01 00 06 06"+year+month+day+hour+minute+second,HEX);
+}
