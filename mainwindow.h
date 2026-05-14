@@ -5,6 +5,7 @@
 #include "serialmanager.h"
 #include "networkmanager.h"
 #include "sendfiledialog.h"
+#include "customitem.h"
 
 #include <QMainWindow>
 #include <QTimer>
@@ -25,8 +26,8 @@ class MainWindow : public QMainWindow
 
 public:
     QTimer *infoTimer_ = nullptr;
-    QTimer *rxTimer_;
-    QTimer *sendTimer_;
+    QTimer *rxTimer_ = nullptr;
+    QTimer *sendTimer_ = nullptr;
 
     QByteArray receiveBuffer_;                             // 接收缓冲区
     QString fileSavePath_;
@@ -62,7 +63,7 @@ private slots:
     void do_readyRead(const QByteArray &byteArray);
     void do_showReceivedData();
     void do_calSelCharCnt();
-    void do_addItemToList(int row = 0, bool isInsert = false);
+    CustomItem* do_addItemToList(int row = 0, bool isInsert = false);
     void do_fileDownload(const SendFile_t &sendFile, SendFileDialog* dialog);
 
     void on_btn_OpenClose_clicked();

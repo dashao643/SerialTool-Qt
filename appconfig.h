@@ -23,7 +23,6 @@ public:
 private:
     QSettings setting_;
 
-    // QList<CustomItem*> loadListWidget(TabPage *tabPage, int index);
     void saveListWidget(TabPage *tabPage, int index);
 
 signals:

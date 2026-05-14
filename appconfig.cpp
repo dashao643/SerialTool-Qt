@@ -38,6 +38,10 @@ Config_t AppConfig::loadConfig()
     config.sendFile.ack = setting_.value("ToolBar/send/ack", "79").toString();
     config.sendFile.timeoutMs = setting_.value("ToolBar/send/timeoutMs", 200).toInt();
 
+    config.localPort = setting_.value("Network/localPort", "65535").toString();
+    config.remoteIP = setting_.value("Network/remoteIP", "192.168.31.155").toString();
+    config.remotePort = setting_.value("Network/remotePort", "65535").toString();
+
     return config;
 }
 
@@ -55,6 +59,10 @@ void AppConfig::saveConfig(const Config_t &config)
     setting_.setValue("ToolBar/send/cmd",config.sendFile.cmd);
     setting_.setValue("ToolBar/send/ack",config.sendFile.ack);
     setting_.setValue("ToolBar/send/timeoutMs", config.sendFile.timeoutMs);
+
+    setting_.setValue("Network/localPort",config.localPort);
+    setting_.setValue("Network/remoteIP",config.remoteIP);
+    setting_.setValue("Network/remotePort",config.remotePort);
 }
 
 QList<TabPageConfig> AppConfig::loadTabPage()
@@ -79,32 +87,6 @@ QList<TabPageConfig> AppConfig::loadTabPage()
     }
     return result;
 }
-
-// QList<CustomItem*> AppConfig::loadListWidget(TabPage *tabPage, int index)
-// {
-//     QList<CustomItem*> itemList; // 保存创建的自定义项
-
-//     int itemCnt = setting_.value(QString("tab_page/page%1/item/cnt").arg(index), 5).toInt();
-//     QListWidget* list = tabPage->getListWidget();
-
-//     for (int i = 0; i < itemCnt; i++) {
-//         QListWidgetItem *item = new QListWidgetItem;
-//         item->setSizeHint(QSize(0, CUSTOM_ITEM_HEIGHT));
-//         CustomItem *addItem = new CustomItem();
-//         list->addItem(item);
-//         list->setItemWidget(item, addItem);
-
-//         QString keyPrefix = QString("tab_page/page%1/item%2/").arg(index).arg(i);
-
-//         QString remark = setting_.value(keyPrefix + "remark","未命名").toString();
-//         QString content = setting_.value(keyPrefix + "content").toString();
-//         int model = setting_.value(keyPrefix + "model", SendModel::ASCII).toInt();
-
-//         addItem->setRemark(remark);
-//         addItem->setContent(content);
-//         addItem->setModel((SendModel)model);
-//     }
-// }
 
 void AppConfig::saveTabPage(const QTabWidget *tabWiget)
 {

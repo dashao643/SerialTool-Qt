@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "customitem.h"
 #include "serialsettingdialog.h"
 
 #include <QInputDialog>
@@ -76,6 +75,9 @@ void MainWindow::uiInit()
     fileSavePath_ = config.filePath;
     ui->plainTextEdit_Show->setFont(config.font);
     ui->dockWidget->setVisible(config.isDockVisible);
+    ui->lineEdit_LocalPort->setText(config.localPort);
+    ui->lineEdit_RemoteIP->setText(config.remoteIP);
+    ui->lineEdit_RemotePort->setText(config.remotePort);
 }
 
 void MainWindow::slotsInit()
@@ -100,19 +102,16 @@ void MainWindow::slotsInit()
     connect(ui->btn_PortRefresh,&QPushButton::clicked,serialManager_,[=](){
         serialManager_->do_btnPortRefresh(ui->cbBox_PortNum);
     });
-    // connect(ui->btn_OpenClose,&QPushButton::clicked,this,[=](){
-
-    // });
     /**************************** networkManager ****************************/
     connect(networkManager_,&NetworkManager::sgn_stateChange,this,&MainWindow::do_netWorkStateUpdate);
     connect(networkManager_,&NetworkManager::sgn_readyRead,this,&MainWindow::do_readyRead);
     connect(networkManager_,&NetworkManager::sgn_btnStateChanged,this,&MainWindow::do_UiUpdate);
+    connect(networkManager_,&NetworkManager::sgn_labelShowState,this,[=](const QString& text){
+        ui->label_InfoR->setText(text);
+    });
     connect(networkManager_,&NetworkManager::sgn_showMessage,[=](const QString &string){
         QMessageBox::information(this, "提示", string);
     });
-    // connect(ui->btn_OpenClose,&QPushButton::clicked,this,[=](){
-
-    // });
     // 选择模式
     connect(ui->cbBox_Model,&QComboBox::currentIndexChanged,this,[=](int index){
         // 切换模式时关闭所有连接，避免冲突
@@ -153,10 +152,11 @@ void MainWindow::slotsInit()
     connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](){
         serialManager_->setBuadRate(ui->cbBox_PortBuad->currentText().toInt());
     });
-    // 服务端禁用远程ip设置
+    // TCP服务端禁用远程ip设置。UDP禁用本地IP设置
     connect(ui->cbBox_Network,&QComboBox::currentIndexChanged,[=](int index){
-        ui->lineEdit_RemoteIP->setDisabled(index == 0);
-        ui->lineEdit_RemotePort->setDisabled(index == 0);
+        ui->lineEdit_RemoteIP->setDisabled(index == TcpServer);
+        ui->lineEdit_RemotePort->setDisabled(index == TcpServer);
+        ui->cbBox_LocalIP->setDisabled(index == UDP);
     });
 }
 
@@ -170,12 +170,9 @@ void MainWindow::loadPageConfig()
         connect(tabPage, &TabPage::insertItem, this, [=](int index){
             do_addItemToList(index, true);
         });
-        QListWidget *list = tabPage->getListWidget();
+        // QListWidget *list = tabPage->getListWidget();
         for(int i = 0; i < page.items.count(); i++){
-            do_addItemToList();
-            // 获取刚刚创建的项
-            QListWidgetItem* item = list->item(i);
-            CustomItem* customItem = qobject_cast<CustomItem*>(list->itemWidget(item));
+            CustomItem* customItem = do_addItemToList();
             ItemConfig& cfg = page.items[i];
             customItem->setRemark(cfg.remark);
             customItem->setContent(cfg.content);
@@ -211,11 +208,11 @@ void MainWindow::sendData(QString content, SendModel model)
         appendCheckData(sendBuf);
     }
     // 串口发送
-    if(ui->cbBox_Model->currentIndex() == 0){
+    if(ui->cbBox_Model->currentIndex() == SERIAL){
         serialManager_->sendData(sendBuf);
     }
     // 网络发送
-    else if(ui->cbBox_Model->currentIndex() == 1){
+    else if(ui->cbBox_Model->currentIndex() == NETWORK){
         networkManager_->sendData(sendBuf);
     }
     if(!isConnected_)
@@ -368,19 +365,29 @@ void MainWindow::on_btn_OpenClose_clicked()
     if(ui->cbBox_Model->currentIndex() == ComModel::SERIAL)
         serialManager_->do_btnOpenClose(ui->cbBox_PortNum);
     else if(ui->cbBox_Model->currentIndex() == ComModel::NETWORK){
-        // TCP服务端，传本地ip;TCP客户端、UDP传远程目标ip
         CurNetworkModel model = (CurNetworkModel)ui->cbBox_Network->currentIndex();
-        QString ip;
-        quint16 port = 0;
+        QString localIp = "", targetIp = "";
+        quint16 localPort = 0, targetPort = 0;
+        // TCP服务端，传本地ip和端口
         if(model == TcpServer){
-            ip = ui->cbBox_LocalIP->currentText();
-            port = ui->lineEdit_LocalPort->text().toInt();
+            localIp = ui->cbBox_LocalIP->currentText();
+            localPort = ui->lineEdit_LocalPort->text().toInt();
+            networkManager_->do_btnOpenClose(model, localIp, localPort);
         }
-        else{
-            ip = ui->lineEdit_RemoteIP->text();
-            port = ui->lineEdit_RemotePort->text().toInt();
+        // CP客户端传远程目标ip和端口;
+        else if(model == TcpClient){
+            targetIp = ui->lineEdit_RemoteIP->text();
+            targetPort = ui->lineEdit_RemotePort->text().toInt();
+            networkManager_->do_btnOpenClose(model, targetIp, targetPort);
         }
-        networkManager_->do_btnOpenClose(model,ip,port);
+        // UDP传本地端口，目标ip和端口
+        else if(model == UDP){
+            networkManager_->do_btnOpenClose(
+                ui->lineEdit_LocalPort->text().toInt(),
+                ui->lineEdit_RemoteIP->text(),
+                ui->lineEdit_RemotePort->text().toInt()
+            );
+        }
     }
 }
 
@@ -572,7 +579,7 @@ void MainWindow::on_actAddTab_triggered()
     });
 }
 
-void MainWindow::do_addItemToList(int row, bool isInsert)
+CustomItem* MainWindow::do_addItemToList(int row, bool isInsert)
 {
     QListWidgetItem *item = new QListWidgetItem;
     item->setSizeHint(QSize(0, CUSTOM_ITEM_HEIGHT));
@@ -588,6 +595,8 @@ void MainWindow::do_addItemToList(int row, bool isInsert)
     listWidget->setItemWidget(item, addItem);
 
     connect(addItem, &CustomItem::sendDataRequest,this,&MainWindow::sendData);
+
+    return addItem;
 }
 
 void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialog)
@@ -656,7 +665,9 @@ void MainWindow::on_actDelTab_triggered()
         return;
     }
     int index = ui->tabWidget->currentIndex();
+    QWidget *w = ui->tabWidget->widget(index);
     ui->tabWidget->removeTab(index);
+    delete w;
     QMessageBox::information(this,"提示",QString("第%1页已删除").arg(index + 1));
 }
 
@@ -699,7 +710,6 @@ void MainWindow::on_tabWidget_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event);
     // 保存配置
     Config_t config;
     config.windowSize = this->size();
@@ -708,11 +718,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     config.filePath = fileSavePath_;
     config.isDockVisible = ui->dockWidget->isVisible();
     config.font = ui->plainTextEdit_Show->font();
-
     config.sendFile = sendFile_;
+    config.localPort = ui->lineEdit_LocalPort->text();
+    config.remoteIP = ui->lineEdit_RemoteIP->text();
+    config.remotePort = ui->lineEdit_RemotePort->text();
     appConfig_->saveConfig(config);
 
     appConfig_->saveTabPage(ui->tabWidget);
+
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::on_toolBar_customContextMenuRequested(const QPoint &pos)

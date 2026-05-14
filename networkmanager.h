@@ -26,11 +26,13 @@ public:
 
 public slots:
     void do_btnOpenClose(CurNetworkModel networkModel, QString ip, quint16 port);
+    void do_btnOpenClose(quint16 localport, QString targetIp, quint16 targetPort);
 
 signals:
     void sgn_btnStateChanged(bool isOpen);
     void sgn_stateChange(QAbstractSocket::SocketState state);
     void sgn_readyRead(const QByteArray &byteArray);
+    void sgn_labelShowState(const QString& text);
     void sgn_showMessage(const QString& text);
 
 private:

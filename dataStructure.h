@@ -61,6 +61,9 @@ typedef struct{
     QFont font;
     bool isDockVisible;
     SendFile_t sendFile;
+    QString localPort;
+    QString remoteIP;
+    QString remotePort;
 } Config_t;
 
 #endif // DATASTRUCTURE_H
