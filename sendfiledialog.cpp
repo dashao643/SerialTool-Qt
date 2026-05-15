@@ -28,6 +28,8 @@ SendFileDialog::SendFileDialog(SendFile_t sendFileConfig, QWidget *parent)
     ui->lineEdit_Cmd->setText(config_.cmd);
     ui->lineEdit_Ack->setText(config_.ack);
     ui->spinBox_Timeout->setValue(config_.timeoutMs);
+
+    // this->setToolTip("下载时请勿操作");
 }
 
 SendFileDialog::~SendFileDialog()

@@ -91,7 +91,7 @@ void NetworkManager::sendData(const QByteArray &content)
     else if(curNetworkModel_ == UDP){
         QHostAddress targetAddr(udpTargetIP_);
         udpSocket_->writeDatagram(content, targetAddr, udpTargetPort_);
-        qDebug()<<"测试network";
+        // qDebug()<<"测试network";
     }
     qDebug()<<curNetworkModel_;
     qDebug()<<udpSocket_->state();

@@ -34,7 +34,7 @@ Config_t AppConfig::loadConfig()
     config.sendFile.model = 0;
     config.sendFile.filePath = setting_.value("ToolBar/send/filePath",QDir::currentPath()).toString();
     config.sendFile.dataSize = setting_.value("ToolBar/send/dataSize", 1024).toInt();
-    config.sendFile.cmd = setting_.value("ToolBar/send/cmd", "7F").toString();
+    config.sendFile.cmd = setting_.value("ToolBar/send/cmd", "01 42 00 01 00 01").toString();
     config.sendFile.ack = setting_.value("ToolBar/send/ack", "79").toString();
     config.sendFile.timeoutMs = setting_.value("ToolBar/send/timeoutMs", 200).toInt();
 

@@ -49,7 +49,7 @@ RESOURCES += \
 
 RC_ICONS = resource\usb_blue.ico
 
-VERSION = 1.1.0
+VERSION = 1.2.0
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
