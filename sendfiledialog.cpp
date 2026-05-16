@@ -59,6 +59,8 @@ void SendFileDialog::on_btn_OpenFile_clicked()
 {
     QString name = QFileDialog::getOpenFileName(this, "选择文件", config_.filePath,
                                  "二进制文件 (*.bin)");
+    if(name.isEmpty())
+        return;
     ui->lineEdit_FilePath->setText(name);
 }
 

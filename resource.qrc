@@ -2,5 +2,12 @@
     <qresource prefix="/">
         <file>resource/usb_blue.ico</file>
         <file>resource/download.ico</file>
+        <file>resource/refresh.png</file>
+        <file>resource/refresh_hover.png</file>
+        <file>resource/style.qss</file>
+        <file>resource/downArrow.png</file>
+        <file>resource/upArrow.png</file>
+        <file>resource/downArrow_hover.png</file>
+        <file>resource/upArrow_hover.png</file>
     </qresource>
 </RCC>

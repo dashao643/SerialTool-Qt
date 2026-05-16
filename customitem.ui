@@ -31,9 +31,15 @@
    </property>
    <item row="1" column="3">
     <widget class="QPushButton" name="btn_Send">
+     <property name="minimumSize">
+      <size>
+       <width>60</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
-       <width>70</width>
+       <width>60</width>
        <height>16777215</height>
       </size>
      </property>
@@ -44,9 +50,15 @@
    </item>
    <item row="0" column="0">
     <widget class="QCheckBox" name="checkBox_Hex">
+     <property name="minimumSize">
+      <size>
+       <width>50</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="maximumSize">
       <size>
-       <width>40</width>
+       <width>50</width>
        <height>16777215</height>
       </size>
      </property>

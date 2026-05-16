@@ -34,3 +34,7 @@ compile_commands.json
 .vscode/
 *.user
 *.suo
+*.json
+
+# 其他文件
+CLAUDE.md

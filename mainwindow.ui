@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1050</width>
     <height>800</height>
    </rect>
   </property>
@@ -65,16 +65,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <property name="spacing">
-        <number>5</number>
+        <number>2</number>
        </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>3</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>5</number>
+        <number>3</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
@@ -83,8 +83,14 @@
         <widget class="QComboBox" name="cbBox_Model">
          <property name="minimumSize">
           <size>
-           <width>75</width>
+           <width>70</width>
            <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>85</width>
+           <height>16777215</height>
           </size>
          </property>
          <item>
@@ -268,13 +274,13 @@
             <widget class="QComboBox" name="cbBox_Network">
              <property name="minimumSize">
               <size>
-               <width>85</width>
+               <width>92</width>
                <height>24</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>85</width>
+               <width>92</width>
                <height>16777215</height>
               </size>
              </property>
@@ -319,8 +325,14 @@
             <widget class="QComboBox" name="cbBox_LocalIP">
              <property name="minimumSize">
               <size>
-               <width>120</width>
+               <width>130</width>
                <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="editable">
@@ -332,13 +344,13 @@
             <widget class="QLineEdit" name="lineEdit_LocalPort">
              <property name="minimumSize">
               <size>
-               <width>42</width>
+               <width>55</width>
                <height>23</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>42</width>
+               <width>50</width>
                <height>16777215</height>
               </size>
              </property>
@@ -377,7 +389,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>100</width>
+               <width>110</width>
                <height>23</height>
               </size>
              </property>
@@ -402,13 +414,13 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>42</width>
+               <width>55</width>
                <height>23</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>42</width>
+               <width>50</width>
                <height>16777215</height>
               </size>
              </property>
@@ -419,22 +431,6 @@
               <number>5</number>
              </property>
             </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Policy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -593,13 +589,13 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>115</width>
+           <width>125</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>115</width>
+           <width>125</width>
            <height>16777215</height>
           </size>
          </property>
@@ -667,7 +663,7 @@
           <number>100</number>
          </property>
          <property name="maximum">
-          <number>1000</number>
+          <number>2000</number>
          </property>
          <property name="singleStep">
           <number>100</number>
@@ -836,17 +832,29 @@
        </item>
        <item>
         <widget class="QSpinBox" name="spBox_Timeout">
+         <property name="minimumSize">
+          <size>
+           <width>70</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>70</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="suffix">
           <string>ms</string>
          </property>
          <property name="minimum">
-          <number>20</number>
+          <number>5</number>
          </property>
          <property name="maximum">
           <number>100</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="value">
           <number>20</number>
@@ -997,7 +1005,7 @@
   <widget class="QDockWidget" name="dockWidget">
    <property name="minimumSize">
     <size>
-     <width>300</width>
+     <width>288</width>
      <height>532</height>
     </size>
    </property>
@@ -1065,7 +1073,7 @@
     <iconset theme="QIcon::ThemeIcon::EditClear"/>
    </property>
    <property name="text">
-    <string>清空显示区</string>
+    <string>清空显示</string>
    </property>
    <property name="toolTip">
     <string>清空显示区</string>
@@ -1121,7 +1129,7 @@
     <iconset theme="QIcon::ThemeIcon::DocumentSave"/>
    </property>
    <property name="text">
-    <string>保存到文件</string>
+    <string>保存文件</string>
    </property>
    <property name="toolTip">
     <string>显示界面内容保存到文本文件</string>

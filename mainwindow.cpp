@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setObjectName("MainWindow");
+    ui->btn_PortRefresh->setText("");
+    ui->btn_OpenClose->setProperty("connected", false);
     qDebug()<<this->width()<<" "<<this->height();
     this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
 
@@ -322,39 +325,17 @@ void MainWindow::do_UiUpdate(bool isOpen)
                  ui->cbBox_Network->currentIndex() == 0){
             ui->label_InfoR->setText("网络状态：服务器监听中...");
         }
-        ui->btn_OpenClose->setStyleSheet(R"(
-            QPushButton{
-                background-color: #f98a52;
-                border-radius: 4px;
-                border: none;
-                padding:6px;
-            }
-            QPushButton:hover{
-                background-color: #fFAa72;
-            }
-            QPushButton:pressed{
-                background-color: #D96a32;
-            }
-        )");
+        ui->btn_OpenClose->setProperty("connected", true);
     }
     else{
         ui->btn_OpenClose->setText("开启");
         ui->label_InfoR->setText("当前状态：关闭");
-        ui->btn_OpenClose->setStyleSheet(R"(
-        QPushButton {
-            background-color: #aaff7f;
-            border-radius: 4px;
-            border: none;
-            padding:6px;
-        }
-        QPushButton:hover{
-            background-color: #caff9f;
-        }
-        QPushButton:pressed{
-            background-color: #8adf5f;
-        }
-        )");
+        ui->btn_OpenClose->setProperty("connected", false);
     }
+
+    // Force QSS re-evaluation for the dynamic property change
+    ui->btn_OpenClose->style()->unpolish(ui->btn_OpenClose);
+    ui->btn_OpenClose->style()->polish(ui->btn_OpenClose);
     ui->actPortSetting->setDisabled(isOpen);
     ui->cbBox_PortNum->setDisabled(isOpen);
     ui->btn_Send->setEnabled(isOpen);
