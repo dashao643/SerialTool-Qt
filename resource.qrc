@@ -4,10 +4,12 @@
         <file>resource/download.ico</file>
         <file>resource/refresh.png</file>
         <file>resource/refresh_hover.png</file>
-        <file>resource/style.qss</file>
         <file>resource/downArrow.png</file>
         <file>resource/upArrow.png</file>
         <file>resource/downArrow_hover.png</file>
         <file>resource/upArrow_hover.png</file>
+        <file>resource/refresh_hover2.png</file>
+        <file>resource/refresh2.png</file>
+        <file>style.qss</file>
     </qresource>
 </RCC>

@@ -175,7 +175,7 @@ QPushButton#btn_PortRefresh {
     background-color: transparent;
     border: 1px solid transparent;
     border-radius: 4px;
-    image: url(:/resource/refresh.png);
+    image: url(:/resource/refresh2.png);
     min-width: 28px;
     min-height: 28px;
     max-width: 36px;
@@ -185,7 +185,7 @@ QPushButton#btn_PortRefresh {
 QPushButton#btn_PortRefresh:hover {
     background-color: #e8eaed;
     border-color: #d0d5dd;
-    image: url(:/resource/refresh_hover.png);
+    image: url(:/resource/refresh_hover2.png);
 }
 
 QPushButton#btn_PortRefresh:pressed {

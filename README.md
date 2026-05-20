@@ -32,7 +32,7 @@
 
 ## 编译环境
 
-Qt6.10.1 + MSVC2022 + Windows10 64位
+Qt6.11.1 + MinGW + Windows10 64位
 
 ### 待更新
 - IAP下载时增加提示

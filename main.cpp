@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     a.setStyle(QStyleFactory::create("Fusion"));
 
     // Load and apply stylesheet
-    QFile styleFile(":/resource/style.qss");
+    QFile styleFile(":style.qss");
     if (styleFile.open(QFile::ReadOnly | QFile::Text)) {
         a.setStyleSheet(styleFile.readAll());
         styleFile.close();
