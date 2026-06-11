@@ -25,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug()<<this->width()<<" "<<this->height();
     this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
 
+    ui->cbBox_PortNum->setView(new QListView());
+    ui->cbBox_Model->setView(new QListView());
+    ui->cbBox_PortBuad->setView(new QListView());
+    ui->cbBox_DataCheck->setView(new QListView());
+
     dataInit();
     uiInit();
     slotsInit();
@@ -438,9 +443,16 @@ void MainWindow::do_calSelCharCnt()
     QString selectedText = ui->plainTextEdit_Show->textCursor().selectedText();
     if(selectedText.isEmpty())
         return;
-    // 按空格/换行分割，统计有效数据个数
-    QStringList list = selectedText.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-    labelInfoRefresh(QString("当前选中个数：%1").arg(list.size()));
+    // HEX按空格/换行分割，统计有效数据个数
+    int size = 0;
+    if(ui->rdBtn_ShowHex->isChecked()){
+        QStringList list = selectedText.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+        size = list.size();
+    }
+    else if(ui->rdBtn_ShowASCII->isChecked()){
+        size = selectedText.size();
+    }
+    labelInfoRefresh(QString("当前选中个数：%1").arg(size));
 }
 
 // 根据当前选择的模式发送数据
@@ -545,7 +557,7 @@ void MainWindow::on_actAddTab_triggered()
     bool isOk = false;
     QString defaultName = "tab" + QString::number(ui->tabWidget->count() + 1);
     QString input = QInputDialog::getText(this,"输入","页面名称:",
-                                          QLineEdit::Normal, defaultName,&isOk);
+                                          QLineEdit::Normal, defaultName, &isOk);
     if(!isOk || input.isEmpty()) return;
 
     TabPage *tabPage = new TabPage();

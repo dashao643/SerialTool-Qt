@@ -1,6 +1,8 @@
 #include "serialsettingdialog.h"
 #include "ui_serialsettingdialog.h"
 
+#include <QListView>
+
 SerialSettingDialog::SerialSettingDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SerialSettingDialog)
@@ -19,6 +21,10 @@ SerialSettingDialog::SerialSettingDialog(QWidget *parent)
     ui->cbBox_DataBit->setCurrentIndex(ui->cbBox_DataBit->findData(QSerialPort::Data8));
     ui->cbBox_StopBit->setCurrentIndex(ui->cbBox_StopBit->findData(QSerialPort::OneStop));
     ui->cbBox_Parity->setCurrentIndex(ui->cbBox_Parity->findData(QSerialPort::NoParity));
+
+    ui->cbBox_DataBit->setView(new QListView());
+    ui->cbBox_StopBit->setView(new QListView());
+    ui->cbBox_Parity->setView(new QListView());
 }
 
 SerialSettingDialog::~SerialSettingDialog()

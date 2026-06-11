@@ -1,15 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>resource/usb_blue.ico</file>
-        <file>resource/download.ico</file>
-        <file>resource/refresh.png</file>
-        <file>resource/refresh_hover.png</file>
-        <file>resource/downArrow.png</file>
-        <file>resource/upArrow.png</file>
-        <file>resource/downArrow_hover.png</file>
-        <file>resource/upArrow_hover.png</file>
-        <file>resource/refresh_hover2.png</file>
-        <file>resource/refresh2.png</file>
         <file>style.qss</file>
+        <file>PicRes/arrowDown.ico</file>
+        <file>PicRes/arrowDown_h.ico</file>
+        <file>PicRes/arrowUp.ico</file>
+        <file>PicRes/arrowUp_h.ico</file>
+        <file>PicRes/download.ico</file>
+        <file>PicRes/refresh.png</file>
+        <file>PicRes/refresh_h.png</file>
+        <file>PicRes/usb_blue.ico</file>
+        <file>PicRes/check.png</file>
     </qresource>
 </RCC>

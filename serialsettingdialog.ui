@@ -44,7 +44,7 @@
         <property name="minimumSize">
          <size>
           <width>70</width>
-          <height>0</height>
+          <height>27</height>
          </size>
         </property>
         <item>
@@ -95,6 +95,12 @@
       </item>
       <item row="0" column="2">
        <widget class="QComboBox" name="cbBox_DataBit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>27</height>
+         </size>
+        </property>
         <property name="currentIndex">
          <number>3</number>
         </property>
@@ -138,6 +144,12 @@
       </item>
       <item row="1" column="2">
        <widget class="QComboBox" name="cbBox_StopBit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>27</height>
+         </size>
+        </property>
         <item>
          <property name="text">
           <string>1</string>

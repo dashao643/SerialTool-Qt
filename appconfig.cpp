@@ -6,9 +6,8 @@
 
 AppConfig::AppConfig(QObject *parent)
     : QObject{parent}
-    , setting_(CONFIG_FILE_NAME,QSettings::IniFormat)
+    , setting_(CONFIG_FILE_NAME, QSettings::IniFormat)
 {
-
 }
 
 Config_t AppConfig::loadConfig()

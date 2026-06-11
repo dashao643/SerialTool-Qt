@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QPushButton>
 
-constexpr int CUSTOM_ITEM_HEIGHT = 60;
+constexpr int CUSTOM_ITEM_HEIGHT = 70;
 
 namespace Ui {
 class CustomItem;
