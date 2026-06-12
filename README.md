@@ -1,6 +1,6 @@
 # Qt串口工具
 
-<img src="./screenshot/interface.png" style="zoom:75%;" />
+<img src="./screenshot/interface.png" style="zoom:50%;" />
 
 ## 功能介绍
 一个基于 Qt6 开发的通用串口、网络调试工具，支持自定义数据发送、IAP升级。

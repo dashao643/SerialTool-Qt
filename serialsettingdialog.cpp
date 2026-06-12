@@ -11,8 +11,6 @@ SerialSettingDialog::SerialSettingDialog(QWidget *parent)
     this->setFixedSize(250,250);
     this->setWindowTitle("串口其它参数配置");
 
-    comboBoxInit();
-
     m_dataBits = QSerialPort::Data8;                // 数据位
     m_stopBits = QSerialPort::OneStop;              // 停止位
     m_parity = QSerialPort::NoParity;               // 校验位
@@ -25,6 +23,8 @@ SerialSettingDialog::SerialSettingDialog(QWidget *parent)
     ui->cbBox_DataBit->setView(new QListView());
     ui->cbBox_StopBit->setView(new QListView());
     ui->cbBox_Parity->setView(new QListView());
+
+    comboBoxInit();
 }
 
 SerialSettingDialog::~SerialSettingDialog()

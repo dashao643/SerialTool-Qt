@@ -6,8 +6,6 @@
 /********************* QWidget *********************/
 QWidget {
   background-color: #ffffff;
-  font-family: "Microsoft YaHei UI", "Segoe UI", sans-serif;
-  font-size: 13px;
 }
 
 /********************* QDialog *********************/
@@ -211,16 +209,15 @@ QComboBox {
   border: 1px solid #d0d5dd;
   border-radius: 4px;
   padding-left: 3px;
-  outline: none; /* 去掉主控件焦点虚线框 */
+  outline: none;
 }
 QComboBox:hover {
   border-color: #4a9eff;
 }
 QComboBox:focus {
   border-color: #4a9eff;
-  outline: none; /* 去掉主控件焦点虚线框 */
+  outline: none;
 }
-/* 文件中添加 ui->cbBox_xxx->setView(new QListView()); */
 QComboBox QAbstractItemView {
   background-color: #ffffff;
   border: 1px solid #d0d5dd;
@@ -228,6 +225,7 @@ QComboBox QAbstractItemView {
   outline: none;
 }
 QComboBox QAbstractItemView::item {
+  color: #222;
   min-height:25px;
   border-radius: 3px;
   border:1px solid rgb(152, 209, 243);
@@ -255,19 +253,31 @@ QComboBox::drop-down {
 }
 
 /********************* QLineEdit *******************/
-/********************* QTextEdit *******************/
-/********************* QPlainTextEdit *******************/
-QLineEdit, QTextEdit, QPlainTextEdit {
+QLineEdit {
   background-color: #ffffff;
-  color: #2c3e50;
+  color: #333;
   border: 1px solid #d0d5dd;
   border-radius: 4px;
-  font-family: "Consolas", "Courier New", "Microsoft YaHei UI", monospace;
-  font-size: 16px;
+  /* font-family: "Consolas", "Courier New", "Microsoft YaHei UI", monospace;
+  font-size: 16px; */
   selection-background-color: #4a9eff;
   selection-color: white;
 }
-QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus{
+QLineEdit:focus {
+  border-color: #4a9eff;
+}
+
+/********************* QTextEdit *******************/
+/********************* QPlainTextEdit *******************/
+QTextEdit, QPlainTextEdit {
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  selection-background-color: #4a9eff;
+  selection-color: white;
+}
+QTextEdit:focus, QPlainTextEdit:focus{
   border-color: #4a9eff;
 }
 
@@ -283,6 +293,7 @@ QSpinBox:focus, QDoubleSpinBox:focus {
   border-color: #4a9eff;
 }
 QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button{
+  min-height: 10px;
   background-color: #dde6f1;
 }
 QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
