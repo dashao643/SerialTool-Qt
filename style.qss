@@ -142,19 +142,19 @@ QPushButton#btn_OpenClose[connected="false"]:pressed {
 QPushButton#btn_PortRefresh {
   border: none;
   background-color: transparent;
-  image: url(:/resource/refresh.png);
+  image: url(:/PicRes/refresh.png);
 }
 
 QPushButton#btn_PortRefresh:hover {
   border: none;
   background-color: transparent;
-  image: url(:/resource/refresh_h.png);
+  image: url(:/PicRes/refresh_h.png);
 }
 
 QPushButton#btn_PortRefresh:pressed {
   border: none;
   background-color: transparent;
-  image: url(:/resource/refresh.png);
+  image: url(:/PicRes/refresh.png);
 }
 
 /********************* QRadioButton *********************/
@@ -252,6 +252,18 @@ QComboBox::drop-down {
   background-color: #a4c7ef;
 }
 
+QComboBox:disabled {
+  background-color: #CCC;
+  color: #7878a4;
+  border-color: #7878a4;
+}
+QComboBox QAbstractItemView::item:disabled {
+  color: #222;
+  background-color: #CCC;
+}
+QComboBox QAbstractItemView::item:selected:disabled {
+  background-color: #CCC;
+}
 /********************* QLineEdit *******************/
 QLineEdit {
   background-color: #ffffff;
@@ -266,7 +278,11 @@ QLineEdit {
 QLineEdit:focus {
   border-color: #4a9eff;
 }
-
+QLineEdit:disabled {
+  background-color: #CCC;
+  color: #7878a4;
+  border-color: #7878a4;
+}
 /********************* QTextEdit *******************/
 /********************* QPlainTextEdit *******************/
 QTextEdit, QPlainTextEdit {

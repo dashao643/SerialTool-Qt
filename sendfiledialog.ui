@@ -169,7 +169,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Ack值：</string>
+         <string>Ack值(Hex)：</string>
         </property>
        </widget>
       </item>
@@ -183,7 +183,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>25</width>
+          <width>60</width>
           <height>28</height>
          </size>
         </property>
@@ -196,8 +196,11 @@
         <property name="text">
          <string>79</string>
         </property>
+        <property name="cursorPosition">
+         <number>2</number>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
