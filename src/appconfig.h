@@ -2,7 +2,7 @@
 #define APPCONFIG_H
 
 #include "dataStructure.h"
-#include "tabpage.h"
+#include "tab_page/tabpage.h"
 
 #include <QObject>
 #include <QSettings>

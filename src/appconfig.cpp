@@ -1,5 +1,5 @@
 #include "appconfig.h"
-#include "customitem.h"
+#include "tab_page/list_item/customitem.h"
 
 #include <QSerialPortInfo>
 #include <QDir>

@@ -4,8 +4,8 @@
 #include "appconfig.h"
 #include "serialmanager.h"
 #include "networkmanager.h"
-#include "sendfiledialog.h"
-#include "customitem.h"
+#include "dialog/sendfiledialog.h"
+#include "tab_page/list_item/customitem.h"
 
 #include <QMainWindow>
 #include <QTimer>
@@ -19,6 +19,8 @@ namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+const QString APP_VERSION = "1.2.1";
 
 class MainWindow : public QMainWindow
 {

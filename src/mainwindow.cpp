@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "serialsettingdialog.h"
+#include "dialog/serialsettingdialog.h"
 
 #include <QInputDialog>
 #include <QMenu>
@@ -13,6 +13,7 @@
 #include <QColorDialog>
 #include <QThread>
 #include <QElapsedTimer>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

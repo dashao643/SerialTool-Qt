@@ -9,10 +9,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // Use Fusion style for consistent QSS rendering across platforms
-    a.setStyle(QStyleFactory::create("Fusion"));
+    // a.setStyle(QStyleFactory::create("Fusion"));
 
     // Load and apply stylesheet
-    QFile styleFile(":style.qss");
+    QFile styleFile(":/style.qss");
     if (styleFile.open(QFile::ReadOnly | QFile::Text)) {
         a.setStyleSheet(styleFile.readAll());
         styleFile.close();
