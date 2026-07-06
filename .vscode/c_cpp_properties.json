@@ -14,7 +14,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "APP_VERSION=\"1.2.1\""
             ],
             "compilerPath": "E:/Qt/Tools/mingw1310_64/bin/g++.exe",
             "cStandard": "c17",
