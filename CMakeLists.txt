@@ -52,6 +52,10 @@ qt_add_executable(${CMAKE_PROJECT_NAME}
 	src/dialog/serialsettingdialog.h
 	src/dialog/serialsettingdialog.ui
 
+	src/dialog/sendw25qxx.cpp
+	src/dialog/sendw25qxx.h
+	src/dialog/sendw25qxx.ui
+
 	src/tab_page/tabpage.cpp
 	src/tab_page/tabpage.h
 	src/tab_page/tabpage.ui

@@ -1,5 +1,6 @@
 #include "appconfig.h"
 #include "tab_page/list_item/customitem.h"
+#include "mainwindow.h"
 
 #include <QSerialPortInfo>
 #include <QDir>
@@ -14,8 +15,8 @@ Config_t AppConfig::loadConfig()
 {
   Config_t config;
   /// 窗口大小
-  // config.windowSize.setWidth(setting_.value("MainWindow/Height", DEFAULT_WINDOW_WIDTH).toInt());
-  // config.windowSize.setHeight(setting_.value("MainWindow/Width", DEFAULT_WINDOW_HEIGHT).toInt());
+  config.windowSize.setWidth(setting_.value("MainWindow/Height", DEFAULT_WINDOW_HEIGHT).toInt());
+  config.windowSize.setHeight(setting_.value("MainWindow/Width", DEFAULT_WINDOW_WIDTH).toInt());
   /// 波特率,默认选择 115200
   int baudRateIndex = qMax(0, QSerialPortInfo::standardBaudRates().size() - 3);
   config.baudRateIndex = setting_.value("SerialConfig/BaudIndex", baudRateIndex).toInt();
@@ -36,6 +37,13 @@ Config_t AppConfig::loadConfig()
   config.sendFile.cmd = setting_.value("ToolBar/send/cmd", "01 42 00 01 00 01").toString();
   config.sendFile.ack = setting_.value("ToolBar/send/ack", "79").toString();
   config.sendFile.timeoutMs = setting_.value("ToolBar/send/timeoutMs", 200).toInt();
+  
+  config.sendW25Q.filePath = setting_.value("ToolBar/w25qxx/filePath", QDir::currentPath()).toString();
+  config.sendW25Q.flashSize = setting_.value("ToolBar/w25qxx/flashSize", 256).toInt();
+  config.sendW25Q.flashIdx = setting_.value("ToolBar/w25qxx/flashIdx", 0).toInt();
+  config.sendW25Q.cmd = setting_.value("ToolBar/w25qxx/cmd", "01 10 00 00 00 00").toString();
+  config.sendW25Q.ack = setting_.value("ToolBar/w25qxx/ack", "80").toString();
+  config.sendW25Q.timeoutMs = setting_.value("ToolBar/w25qxx/timeoutMs", 200).toInt();
 
   config.localPort = setting_.value("Network/localPort", "65535").toString();
   config.remoteIP = setting_.value("Network/remoteIP", "192.168.31.155").toString();
@@ -48,20 +56,27 @@ void AppConfig::saveConfig(const Config_t &config)
 {
   setting_.setValue("MainWindow/Height", config.windowSize);
   setting_.setValue("SerialConfig/BaudIndex", config.baudRateIndex);
-  setting_.setValue("Send/CheckMode",config.check);
-  setting_.setValue("ToolBar/filePath",config.filePath);
+  setting_.setValue("Send/CheckMode", config.check);
+  setting_.setValue("ToolBar/filePath", config.filePath);
   setting_.setValue("ShowWindow/font", config.font);
   setting_.setValue("ToolBar/dockVisible", config.isDockVisible);
 
   setting_.setValue("ToolBar/send/filePath", config.sendFile.filePath);
   setting_.setValue("ToolBar/send/dataSize", config.sendFile.dataSize);
-  setting_.setValue("ToolBar/send/cmd",config.sendFile.cmd);
-  setting_.setValue("ToolBar/send/ack",config.sendFile.ack);
+  setting_.setValue("ToolBar/send/cmd", config.sendFile.cmd);
+  setting_.setValue("ToolBar/send/ack", config.sendFile.ack);
   setting_.setValue("ToolBar/send/timeoutMs", config.sendFile.timeoutMs);
 
-  setting_.setValue("Network/localPort",config.localPort);
-  setting_.setValue("Network/remoteIP",config.remoteIP);
-  setting_.setValue("Network/remotePort",config.remotePort);
+  setting_.setValue("ToolBar/w25qxx/filePath", config.sendW25Q.filePath);
+  setting_.setValue("ToolBar/w25qxx/flashSize", config.sendW25Q.flashSize);
+  setting_.setValue("ToolBar/w25qxx/flashIdx", config.sendW25Q.flashIdx);
+  setting_.setValue("ToolBar/w25qxx/cmd", config.sendW25Q.cmd);
+  setting_.setValue("ToolBar/w25qxx/ack", config.sendW25Q.ack);
+  setting_.setValue("ToolBar/w25qxx/timeoutMs", config.sendW25Q.timeoutMs);
+
+  setting_.setValue("Network/localPort", config.localPort);
+  setting_.setValue("Network/remoteIP", config.remoteIP);
+  setting_.setValue("Network/remotePort", config.remotePort);
 }
 
 QList<TabPageConfig> AppConfig::loadTabPage()

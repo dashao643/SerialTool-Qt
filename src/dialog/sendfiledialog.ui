@@ -284,7 +284,7 @@
       <string>下载</string>
      </property>
      <property name="icon">
-      <iconset resource="resource.qrc">
+      <iconset>
        <normaloff>:/picture/download.ico</normaloff>:/picture/download.ico</iconset>
      </property>
     </widget>
@@ -317,7 +317,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resource.qrc"/>
+  <include location="../../assets/assets.qrc"/>
  </resources>
  <connections/>
 </ui>

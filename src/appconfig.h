@@ -9,6 +9,8 @@
 #include <QTabWidget>
 
 const QString CONFIG_FILE_NAME = "setting.ini";
+// constexpr int DEFAULT_WINDOW_WIDTH = 1035;
+// constexpr int DEFAULT_WINDOW_HEIGHT = 800;
 
 class AppConfig : public QObject
 {

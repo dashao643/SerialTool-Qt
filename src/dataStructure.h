@@ -47,6 +47,16 @@ typedef struct{
   int model;
 } SendFile_t;
 
+typedef struct{
+  QString filePath;
+  int flashSize;
+  int flashIdx;
+  QString cmd;
+  QString ack;
+  int timeoutMs;
+  int model;
+} SendW25Qxx_t;
+
 typedef struct
 {
   QString name;
@@ -61,6 +71,7 @@ typedef struct{
   QFont font;
   bool isDockVisible;
   SendFile_t sendFile;
+  SendW25Qxx_t sendW25Q;
   QString localPort;
   QString remoteIP;
   QString remotePort;

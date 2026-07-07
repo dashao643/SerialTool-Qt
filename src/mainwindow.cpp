@@ -14,7 +14,6 @@
 #include <QThread>
 #include <QElapsedTimer>
 
-
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
@@ -92,6 +91,8 @@ void MainWindow::uiInit()
   // 加载配置
   Config_t config = appConfig_->loadConfig();
   sendFile_ = config.sendFile;
+  sendW25Q_ = config.sendW25Q;
+  // 执行后窗口不在桌面正中心
   // this->resize(config.windowSize);
   ui->cbBox_PortBuad->setCurrentIndex(config.baudRateIndex);
   ui->cbBox_DataCheck->setCurrentIndex(config.check);
@@ -164,12 +165,22 @@ void MainWindow::slotsInit()
   connect(ui->actSendFile,&QAction::triggered,this,[=](){
     sendFile_.model = ui->cbBox_Model->currentIndex();
     SendFileDialog dialog(sendFile_, this);
-    connect(&dialog,&SendFileDialog::download,this,[=, &dialog](const SendFile_t& cfg){
+    connect(&dialog,&SendFileDialog::download,this,[=, &dialog](const SendFile_t &cfg){
       do_fileDownload(cfg, &dialog);
     });
     dialog.exec();
     isFileDownload = false;
     sendFile_ = dialog.getConfig();
+  });
+  connect(ui->actSendW25Q,&QAction::triggered,this,[=](){
+    sendW25Q_.model = ui->cbBox_Model->currentIndex();
+    SendW25Qxx dialog(sendW25Q_, this);
+    connect(&dialog, &SendW25Qxx::tranmit, this, [=, &dialog](const SendW25Qxx_t &cfg){
+      // do_fileDownload(cfg, &dialog);
+    });
+    dialog.exec();
+    isFileDownload = false;
+    sendW25Q_ = dialog.getConfig();
   });
   // 波特率修改
   connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](){
@@ -657,7 +668,7 @@ void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialo
     showSendData(pack);
 
     if (!waitAck(config.ack, config.timeoutMs)) {
-      QMessageBox::critical(this,"提示","ACK超时，升级失败");
+      QMessageBox::critical(this,"提示","ACK超时, 升级失败");
       return;
     }
     sent += len;
@@ -727,6 +738,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   config.isDockVisible = ui->dockWidget->isVisible();
   config.font = ui->plainTextEdit_Show->font();
   config.sendFile = sendFile_;
+  config.sendW25Q = sendW25Q_;
   config.localPort = ui->lineEdit_LocalPort->text();
   config.remoteIP = ui->lineEdit_RemoteIP->text();
   config.remotePort = ui->lineEdit_RemotePort->text();

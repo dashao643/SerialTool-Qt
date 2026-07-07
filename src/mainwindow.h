@@ -5,6 +5,7 @@
 #include "serialmanager.h"
 #include "networkmanager.h"
 #include "dialog/sendfiledialog.h"
+#include "dialog/sendw25qxx.h"
 #include "tab_page/list_item/customitem.h"
 
 #include <QMainWindow>
@@ -20,8 +21,6 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-// const QString APP_VERSION = "1.2.1";
-
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -34,6 +33,7 @@ public:
   QByteArray receiveBuffer_;                             // 接收缓冲区
   QString fileSavePath_;
   SendFile_t sendFile_;
+  SendW25Qxx_t sendW25Q_;
 
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
@@ -72,6 +72,7 @@ private slots:
   void on_btn_OpenClose_clicked();
   void on_btn_Send_clicked();
   void on_rdBtn_ShowASCII_clicked();
+  
   void on_actPortSetting_triggered();
   void on_actSave_triggered();
   void on_actFont_triggered();

@@ -1007,6 +1007,7 @@
    <addaction name="actAddItem"/>
    <addaction name="separator"/>
    <addaction name="actSendFile"/>
+   <addaction name="actSendW25Q"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
    <property name="minimumSize">
@@ -1272,6 +1273,23 @@
    </property>
    <property name="toolTip">
     <string>时间同步</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actSendW25Q">
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MailReplySender"/>
+   </property>
+   <property name="text">
+    <string>W25Q</string>
+   </property>
+   <property name="toolTip">
+    <string>W25Q</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
