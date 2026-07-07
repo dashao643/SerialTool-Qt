@@ -142,19 +142,19 @@ QPushButton#btn_OpenClose[connected="false"]:pressed {
 QPushButton#btn_PortRefresh {
   border: none;
   background-color: transparent;
-  image: url(:/PicRes/refresh.png);
+  image: url(:/picture/refresh.png);
 }
 
 QPushButton#btn_PortRefresh:hover {
   border: none;
   background-color: transparent;
-  image: url(:/PicRes/refresh_h.png);
+  image: url(:/picture/refresh_h.png);
 }
 
 QPushButton#btn_PortRefresh:pressed {
   border: none;
   background-color: transparent;
-  image: url(:/PicRes/refresh.png);
+  image: url(:/picture/refresh.png);
 }
 
 /********************* QRadioButton *********************/
@@ -194,9 +194,9 @@ QCheckBox::indicator:checked {
   border: 1px solid #b0b8c0;
   border-radius: 2px;
   background-color: #ffffff;
-  image: url(:PicRes/check.png);
-  width: 12px;
-  height: 12px;
+  image: url(:picture/check.png);
+  width: 11px;
+  height: 11px;
 }
 
 QCheckBox::indicator:hover {

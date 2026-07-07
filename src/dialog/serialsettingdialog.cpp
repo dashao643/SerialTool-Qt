@@ -16,15 +16,15 @@ SerialSettingDialog::SerialSettingDialog(QWidget *parent)
   m_parity = QSerialPort::NoParity;               // 校验位
   m_flowControl = QSerialPort::NoFlowControl;     // 控制流
 
-  ui->cbBox_DataBit->setCurrentIndex(ui->cbBox_DataBit->findData(QSerialPort::Data8));
-  ui->cbBox_StopBit->setCurrentIndex(ui->cbBox_StopBit->findData(QSerialPort::OneStop));
-  ui->cbBox_Parity->setCurrentIndex(ui->cbBox_Parity->findData(QSerialPort::NoParity));
-
   ui->cbBox_DataBit->setView(new QListView());
   ui->cbBox_StopBit->setView(new QListView());
   ui->cbBox_Parity->setView(new QListView());
-
+  
   comboBoxInit();
+
+  ui->cbBox_DataBit->setCurrentIndex(ui->cbBox_DataBit->findData(QSerialPort::Data8));
+  ui->cbBox_StopBit->setCurrentIndex(ui->cbBox_StopBit->findData(QSerialPort::OneStop));
+  ui->cbBox_Parity->setCurrentIndex(ui->cbBox_Parity->findData(QSerialPort::NoParity));
 }
 
 SerialSettingDialog::~SerialSettingDialog()

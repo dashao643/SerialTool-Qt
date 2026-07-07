@@ -26,28 +26,34 @@ MainWindow::MainWindow(QWidget *parent)
   qDebug()<<this->width()<<" "<<this->height();
   this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
 
-  ui->cbBox_PortNum->setView(new QListView);
-  ui->cbBox_Model->setView(new QListView);
-  ui->cbBox_PortBuad->setView(new QListView);
-  ui->cbBox_DataCheck->setView(new QListView);
-  ui->cbBox_Network->setView(new QListView);
-  // setView 之前 setupUi 已加载的静态 item，新 QListView 布局不到 → 清掉重加
-  ui->cbBox_Model->clear();
-  ui->cbBox_Model->addItems({"串口配置", "网络配置", "蓝牙配置"});
-  ui->cbBox_DataCheck->clear();
-  ui->cbBox_DataCheck->addItems({"None", "ModbusCRC16", "ADD8"});
-  ui->cbBox_Network->clear();
-  ui->cbBox_Network->addItems({"TCP服务端", "TCP客户端", "UDP"});
-
+  cbBoxInit();
   dataInit();
   uiInit();
   slotsInit();
+
   serialManager_->setBuadRate(ui->cbBox_PortBuad->currentText().toInt());
 }
 
 MainWindow::~MainWindow()
 {
   delete ui;
+}
+
+void MainWindow::cbBoxInit()
+{
+  ui->cbBox_PortNum->setView(new QListView);
+  ui->cbBox_Model->setView(new QListView);
+  ui->cbBox_PortBuad->setView(new QListView);
+  ui->cbBox_DataCheck->setView(new QListView);
+  ui->cbBox_Network->setView(new QListView);
+
+  // setView 之前 setupUi 已加载的静态 item，新 QListView 布局不到 → 清掉重加
+  ui->cbBox_Model->clear();
+  ui->cbBox_DataCheck->clear();
+  ui->cbBox_Network->clear();
+  ui->cbBox_Model->addItems({"串口配置", "网络配置", "蓝牙配置"});
+  ui->cbBox_DataCheck->addItems({"None", "ModbusCRC16", "ADD8"});
+  ui->cbBox_Network->addItems({"TCP服务端", "TCP客户端", "UDP"});
 }
 
 void MainWindow::dataInit()

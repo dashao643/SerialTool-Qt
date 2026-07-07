@@ -37,6 +37,7 @@ public:
 
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
+  void cbBoxInit();
   void dataInit();
   void uiInit();
   void slotsInit();

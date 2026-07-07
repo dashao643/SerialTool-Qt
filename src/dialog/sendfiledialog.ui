@@ -285,7 +285,7 @@
      </property>
      <property name="icon">
       <iconset resource="resource.qrc">
-       <normaloff>:/PicRes/download.ico</normaloff>:/PicRes/download.ico</iconset>
+       <normaloff>:/picture/download.ico</normaloff>:/picture/download.ico</iconset>
      </property>
     </widget>
    </item>
