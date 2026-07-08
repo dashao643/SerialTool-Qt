@@ -29,11 +29,14 @@ private:
   Ui::SendW25Qxx *ui;
 
   int fileSize_ = 0;
-  int pageCntInSector_ = 0;
+  // int pageCntInSector_ = 0;
 
   void labelDataRefresh(QString filePath);
   void pageCntRefresh(int flashSize, int pageSize);
   void sectorRangeRefresh(int basePage);
+  void regAddrRefresh(int basePage);
+  void regCntRefresh(int pageCnt);
+
 protected:
 
 private slots:

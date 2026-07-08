@@ -176,7 +176,7 @@ void MainWindow::slotsInit()
     sendW25Q_.model = ui->cbBox_Model->currentIndex();
     SendW25Qxx dialog(sendW25Q_, this);
     connect(&dialog, &SendW25Qxx::tranmit, this, [=, &dialog](const SendW25Qxx_t &cfg){
-      // do_fileDownload(cfg, &dialog);
+      do_fileDownload(cfg, &dialog);
     });
     dialog.exec();
     isFileDownload = false;
@@ -675,6 +675,11 @@ void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialo
     progressBar->setValue(sent);
   }
   QMessageBox::information(this,"完成","文件发送成功!");
+}
+
+void MainWindow::do_fileDownload(const SendW25Qxx_t &sendFile, SendW25Qxx *dialog)
+{
+  
 }
 
 void MainWindow::on_actDelTab_triggered()

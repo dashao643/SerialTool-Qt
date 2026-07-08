@@ -68,6 +68,7 @@ private slots:
   void do_calSelCharCnt();
   CustomItem* do_addItemToList(int row = 0, bool isInsert = false);
   void do_fileDownload(const SendFile_t &sendFile, SendFileDialog* dialog);
+  void do_fileDownload(const SendW25Qxx_t &sendFile, SendW25Qxx* dialog);
 
   void on_btn_OpenClose_clicked();
   void on_btn_Send_clicked();

@@ -90,8 +90,12 @@ void SendW25Qxx::labelDataRefresh(QString filePath)
   ui->label_fileSize->setText(QString("%1B").arg(fileSize_));
 
   pageCntRefresh(fileSize_, ui->spinBox_flashPageSize->value());
+  
+  int basePage = ui->spinBox_flashPageIdx->value();
+  sectorRangeRefresh(basePage);
 
-  sectorRangeRefresh(ui->spinBox_flashPageIdx->value());
+  regAddrRefresh(basePage);
+  regCntRefresh(ui->label_flashPageCnt->text().toInt());
 }
 
 void SendW25Qxx::pageCntRefresh(int flashSize, int pageSize)
@@ -99,20 +103,42 @@ void SendW25Qxx::pageCntRefresh(int flashSize, int pageSize)
   double pageCnt = flashSize / (double)pageSize;
 
   ui->label_flashPageCnt->setText(QString::number(qCeil(pageCnt)));
-
-  pageCntInSector_ = FLASH_SECTOR_SIZE / pageSize;
-  // qDebug()<<pageCntInSector_;
 }
 
 void SendW25Qxx::sectorRangeRefresh(int basePage)
 {
-  double cnt = (double)fileSize_ / FLASH_SECTOR_SIZE;
-
-  ui->label_sectorRange->setText(QString::number(qCeil(cnt)));
-
   int pageCnt = ui->label_flashPageCnt->text().toInt();
-  int sumPage = basePage + pageCnt;
-  qDebug()<<sumPage;
+  int pageSize = ui->spinBox_flashPageSize->value();
+
+  int startByte = basePage * pageSize;
+  int endByte = (basePage + pageCnt) * pageSize - 1;
+
+  int startSector = startByte / FLASH_SECTOR_SIZE;
+  int endSector = endByte / FLASH_SECTOR_SIZE;
+
+  ui->label_sectorRange->setText(QString("%1 - %2").arg(startSector).arg(endSector));
+}
+
+void SendW25Qxx::regAddrRefresh(int basePage)
+{
+  // 取出后两个数据(XX XX)
+  QString regCntStr = ui->lineEdit_reg->text().right(5);
+
+  QString hexStr = QString("%1").arg(basePage, 4, 16, QChar('0')).toUpper();
+  QString result = hexStr.left(2) + " " + hexStr.right(2);
+  
+  ui->lineEdit_reg->setText(result + " " + regCntStr);
+}
+
+void SendW25Qxx::regCntRefresh(int pageCnt)
+{
+  // 取出后前个数据(XX XX)
+  QString regCntStr = ui->lineEdit_reg->text().left(5);
+
+  QString hexStr = QString("%1").arg(pageCnt, 4, 16, QChar('0')).toUpper();
+  QString result = hexStr.left(2) + " " + hexStr.right(2);
+  
+  ui->lineEdit_reg->setText(regCntStr + " " + result);
 }
 
 void SendW25Qxx::on_btn_transmit_clicked()
@@ -123,9 +149,12 @@ void SendW25Qxx::on_btn_transmit_clicked()
 void SendW25Qxx::on_spinBox_flashPageSize_valueChanged(int i)
 {
   pageCntRefresh(fileSize_, i);
+  regCntRefresh(ui->label_flashPageCnt->text().toInt());
+  sectorRangeRefresh(ui->spinBox_flashPageIdx->value());
 }
 
 void SendW25Qxx::on_spinBox_flashPageIdx_valueChanged(int i)
 {
   sectorRangeRefresh(i);
+  regAddrRefresh(i);
 }
