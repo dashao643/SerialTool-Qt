@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
   this->setObjectName("MainWindow");
   ui->btn_PortRefresh->setText("");
   ui->btn_OpenClose->setProperty("connected", false);
-  qDebug()<<this->width()<<" "<<this->height();
+  qDebug() << "width =" << this->width() << "height =" << this->height();
   this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
 
   cbBoxInit();
@@ -765,12 +765,17 @@ void MainWindow::on_actTimeSyn_triggered()
   auto toHex2 = [](int val) {
     return QString("%1").arg(val, 2, 16, QChar('0')).toUpper();
   };
-  QString year   = toHex2(QDate::currentDate().year() % 100);
-  QString month  = toHex2(QDate::currentDate().month());
-  QString day    = toHex2(QDate::currentDate().day());
-  QString hour   = toHex2(QTime::currentTime().hour());
-  QString minute = toHex2(QTime::currentTime().minute());
-  QString second = toHex2(QTime::currentTime().second());
 
-  sendData("01 10 00 01 00 06 06"+year+month+day+hour+minute+second,HEX);
+  QDate curDate = QDate::currentDate();
+  QTime curTime = QTime::currentTime();
+
+  QString year   = toHex2(curDate.year() % 100);
+  QString month  = toHex2(curDate.month());
+  QString day    = toHex2(curDate.day());
+  QString hour   = toHex2(curTime.hour());
+  QString minute = toHex2(curTime.minute());
+  QString second = toHex2(curTime.second());
+
+  // 从机地址 + 指令码 + 寄存器地址 + 寄存器数量 + 字节数
+  sendData("01 10 FF FF 00 06 06" + year + month + day + hour + minute + second, HEX);
 }
