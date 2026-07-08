@@ -7,7 +7,7 @@
 
 // spinBox_flashPageSize 可以用继承 stepBy 实现指数步长
 
-SendW25Qxx::SendW25Qxx(const SendW25Qxx_t &config, QWidget *parent)
+SendW25Qxx::SendW25Qxx(const SendFile_t &config, int flashIdx, QWidget *parent)
   : QDialog(parent)
   , ui(new Ui::SendW25Qxx)
 {
@@ -29,8 +29,8 @@ SendW25Qxx::SendW25Qxx(const SendW25Qxx_t &config, QWidget *parent)
 
   // 配置显示
   ui->lineEdit_filePath->setText(config.filePath);
-  ui->spinBox_flashPageSize->setValue(config.flashSize);
-  ui->spinBox_flashPageIdx->setValue(config.flashIdx);
+  ui->spinBox_flashPageSize->setValue(config.dataSize);
+  ui->spinBox_flashPageIdx->setValue(flashIdx);
   ui->lineEdit_cmd->setText(config.cmd);
   ui->lineEdit_ack->setText(config.ack);
   ui->spinBox_timeout->setValue(config.timeoutMs);
@@ -46,17 +46,19 @@ SendW25Qxx::~SendW25Qxx()
   delete ui;
 }
 
-SendW25Qxx_t SendW25Qxx::getConfig() const
+SendFile_t SendW25Qxx::getConfig(int *flashIdx) const
 {
-  SendW25Qxx_t cfg = {0};
+  SendFile_t cfg = {0};
 
   cfg.filePath = ui->lineEdit_filePath->text();
-  cfg.flashSize = ui->spinBox_flashPageSize->value();
-  cfg.flashIdx = ui->spinBox_flashPageIdx->value();
+  cfg.dataSize = ui->spinBox_flashPageSize->value();
   cfg.cmd = ui->lineEdit_cmd->text();
   cfg.ack = ui->lineEdit_ack->text();
   cfg.timeoutMs = ui->spinBox_timeout->value();
 
+  if(flashIdx)
+    *flashIdx = ui->spinBox_flashPageIdx->value();
+    
   return cfg;
 }
 

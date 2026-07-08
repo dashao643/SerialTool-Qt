@@ -33,7 +33,8 @@ public:
   QByteArray receiveBuffer_;                             // 接收缓冲区
   QString fileSavePath_;
   SendFile_t sendFile_;
-  SendW25Qxx_t sendW25Q_;
+  SendFile_t sendW25Q_;
+  int flashIdx_ = 0;
 
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
@@ -67,8 +68,7 @@ private slots:
   void do_showReceivedData();
   void do_calSelCharCnt();
   CustomItem* do_addItemToList(int row = 0, bool isInsert = false);
-  void do_fileDownload(const SendFile_t &sendFile, SendFileDialog* dialog);
-  void do_fileDownload(const SendW25Qxx_t &sendFile, SendW25Qxx* dialog);
+  void do_fileDownload(const SendFile_t &config, QProgressBar *progressBar);
 
   void on_btn_OpenClose_clicked();
   void on_btn_Send_clicked();

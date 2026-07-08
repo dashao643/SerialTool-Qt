@@ -39,11 +39,11 @@ Config_t AppConfig::loadConfig()
   config.sendFile.timeoutMs = setting_.value("ToolBar/send/timeoutMs", 200).toInt();
   
   config.sendW25Q.filePath = setting_.value("ToolBar/w25qxx/filePath", QDir::currentPath()).toString();
-  config.sendW25Q.flashSize = setting_.value("ToolBar/w25qxx/flashSize", 256).toInt();
-  config.sendW25Q.flashIdx = setting_.value("ToolBar/w25qxx/flashIdx", 0).toInt();
+  config.sendW25Q.dataSize = setting_.value("ToolBar/w25qxx/flashSize", 256).toInt();
   config.sendW25Q.cmd = setting_.value("ToolBar/w25qxx/cmd", "01 10 00 00 00 00").toString();
   config.sendW25Q.ack = setting_.value("ToolBar/w25qxx/ack", "80").toString();
   config.sendW25Q.timeoutMs = setting_.value("ToolBar/w25qxx/timeoutMs", 200).toInt();
+  config.flashIdx = setting_.value("ToolBar/w25qxx/flashIdx", 0).toInt();
 
   config.localPort = setting_.value("Network/localPort", "65535").toString();
   config.remoteIP = setting_.value("Network/remoteIP", "192.168.31.155").toString();
@@ -68,11 +68,11 @@ void AppConfig::saveConfig(const Config_t &config)
   setting_.setValue("ToolBar/send/timeoutMs", config.sendFile.timeoutMs);
 
   setting_.setValue("ToolBar/w25qxx/filePath", config.sendW25Q.filePath);
-  setting_.setValue("ToolBar/w25qxx/flashSize", config.sendW25Q.flashSize);
-  setting_.setValue("ToolBar/w25qxx/flashIdx", config.sendW25Q.flashIdx);
+  setting_.setValue("ToolBar/w25qxx/flashSize", config.sendW25Q.dataSize);
   setting_.setValue("ToolBar/w25qxx/cmd", config.sendW25Q.cmd);
   setting_.setValue("ToolBar/w25qxx/ack", config.sendW25Q.ack);
   setting_.setValue("ToolBar/w25qxx/timeoutMs", config.sendW25Q.timeoutMs);
+  setting_.setValue("ToolBar/w25qxx/flashIdx", config.flashIdx);
 
   setting_.setValue("Network/localPort", config.localPort);
   setting_.setValue("Network/remoteIP", config.remoteIP);

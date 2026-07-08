@@ -17,13 +17,13 @@ class SendW25Qxx : public QDialog
   Q_OBJECT
 
 public:
-  explicit SendW25Qxx(const SendW25Qxx_t &config, QWidget *parent = nullptr);
+  explicit SendW25Qxx(const SendFile_t &config, int flashIdx, QWidget *parent = nullptr);
   ~SendW25Qxx();
-  SendW25Qxx_t getConfig() const;
+  SendFile_t getConfig(int *flashIdx = nullptr) const;
   QProgressBar* getProgress(void);
 
 signals:
-  void tranmit(const SendW25Qxx_t &sendFile_);
+  void tranmit(const SendFile_t &sendW25Qxx);
 
 private:
   Ui::SendW25Qxx *ui;

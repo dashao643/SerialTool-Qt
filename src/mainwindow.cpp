@@ -92,6 +92,7 @@ void MainWindow::uiInit()
   Config_t config = appConfig_->loadConfig();
   sendFile_ = config.sendFile;
   sendW25Q_ = config.sendW25Q;
+  flashIdx_ = config.flashIdx;
   // 执行后窗口不在桌面正中心
   // this->resize(config.windowSize);
   ui->cbBox_PortBuad->setCurrentIndex(config.baudRateIndex);
@@ -172,15 +173,15 @@ void MainWindow::slotsInit()
     isFileDownload = false;
     sendFile_ = dialog.getConfig();
   });
-  connect(ui->actSendW25Q,&QAction::triggered,this,[=](){
+  connect(ui->actSendW25Q, &QAction::triggered, this, [=](){
     sendW25Q_.model = ui->cbBox_Model->currentIndex();
-    SendW25Qxx dialog(sendW25Q_, this);
-    connect(&dialog, &SendW25Qxx::tranmit, this, [=, &dialog](const SendW25Qxx_t &cfg){
-      do_fileDownload(cfg, &dialog);
+    SendW25Qxx dialog(sendW25Q_, flashIdx_, this);
+    connect(&dialog, &SendW25Qxx::tranmit, this, [=, &dialog](const SendFile_t &cfg){
+      // do_fileDownload(cfg, dialog);
     });
     dialog.exec();
     isFileDownload = false;
-    sendW25Q_ = dialog.getConfig();
+    sendW25Q_ = dialog.getConfig(&flashIdx_);
   });
   // 波特率修改
   connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](){
@@ -618,7 +619,7 @@ CustomItem* MainWindow::do_addItemToList(int row, bool isInsert)
   return addItem;
 }
 
-void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialog)
+void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progressBar)
 {
   if(sendFile_.model == 0 && !serialManager_->isOpen()){
     QMessageBox::information(this,"提示","串口未开启");
@@ -675,11 +676,6 @@ void MainWindow::do_fileDownload(const SendFile_t &config, SendFileDialog* dialo
     progressBar->setValue(sent);
   }
   QMessageBox::information(this,"完成","文件发送成功!");
-}
-
-void MainWindow::do_fileDownload(const SendW25Qxx_t &sendFile, SendW25Qxx *dialog)
-{
-  
 }
 
 void MainWindow::on_actDelTab_triggered()
@@ -744,6 +740,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   config.font = ui->plainTextEdit_Show->font();
   config.sendFile = sendFile_;
   config.sendW25Q = sendW25Q_;
+  config.flashIdx = flashIdx_;
   config.localPort = ui->lineEdit_LocalPort->text();
   config.remoteIP = ui->lineEdit_RemoteIP->text();
   config.remotePort = ui->lineEdit_RemotePort->text();

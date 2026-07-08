@@ -40,28 +40,18 @@ typedef struct
 
 typedef struct{
   QString filePath;
-  int dataSize;
+  int dataSize; // (flashSize)
   QString cmd;
   QString ack;
   int timeoutMs;
   int model;
 } SendFile_t;
 
-typedef struct{
-  QString filePath;
-  int flashSize;
-  int flashIdx;
-  QString cmd;
-  QString ack;
-  int timeoutMs;
-  int model;
-} SendW25Qxx_t;
-
 typedef struct
 {
   QString name;
   QList<ItemConfig> items;
-}TabPageConfig;
+} TabPageConfig;
 
 typedef struct{
   QSize windowSize;
@@ -71,7 +61,8 @@ typedef struct{
   QFont font;
   bool isDockVisible;
   SendFile_t sendFile;
-  SendW25Qxx_t sendW25Q;
+  SendFile_t sendW25Q;
+  int flashIdx;
   QString localPort;
   QString remoteIP;
   QString remotePort;
