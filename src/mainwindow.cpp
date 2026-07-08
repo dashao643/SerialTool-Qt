@@ -167,7 +167,7 @@ void MainWindow::slotsInit()
     sendFile_.model = ui->cbBox_Model->currentIndex();
     SendFileDialog dialog(sendFile_, this);
     connect(&dialog,&SendFileDialog::download,this,[=, &dialog](const SendFile_t &cfg){
-      do_fileDownload(cfg, &dialog);
+      do_fileDownload(cfg, dialog.getProgress());
     });
     dialog.exec();
     isFileDownload = false;
@@ -177,7 +177,7 @@ void MainWindow::slotsInit()
     sendW25Q_.model = ui->cbBox_Model->currentIndex();
     SendW25Qxx dialog(sendW25Q_, flashIdx_, this);
     connect(&dialog, &SendW25Qxx::tranmit, this, [=, &dialog](const SendFile_t &cfg){
-      // do_fileDownload(cfg, dialog);
+      do_fileDownload(cfg, dialog.getProgress());
     });
     dialog.exec();
     isFileDownload = false;
@@ -328,12 +328,14 @@ void MainWindow::appendAdd8(QByteArray &data)
 
 bool MainWindow::waitAck(const QString &ackStr, int timeoutMs)
 {
+  QByteArray targetAck = QByteArray::fromHex(ackStr.toUtf8());
+  if (targetAck.isEmpty()) return false;
+
   QElapsedTimer timer;
   timer.start();
-  QByteArray targetAck = QByteArray::fromHex(ackStr.toUtf8());
 
   while (timer.elapsed() < timeoutMs) {
-    // 让界面 & 串口接收正常运行
+    // 退出循环, 处理事件
     QCoreApplication::processEvents();
 
     // 检查是否收到正确 ACK
@@ -641,7 +643,7 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
   }
   QByteArray content = file.readAll();
   file.close();
-  QProgressBar *progressBar = dialog->getProgress();
+
   progressBar->setMaximum(content.size());
 
   // 阻塞式写法。先发送握手命令，附带校验
@@ -650,7 +652,7 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
   sendData(config.cmd, HEX);
   bool ackOK = waitAck(config.ack, config.timeoutMs);
   if (!ackOK) {
-    QMessageBox::critical(this,"提示","握手超时，升级失败");
+    QMessageBox::critical(this,"提示","等待超时, 升级或传输失败");
     return;
   }
 
@@ -669,7 +671,7 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
     showSendData(pack);
 
     if (!waitAck(config.ack, config.timeoutMs)) {
-      QMessageBox::critical(this,"提示","ACK超时, 升级失败");
+      QMessageBox::critical(this,"提示","ACK超时, 升级或传输失败");
       return;
     }
     sent += len;

@@ -40,7 +40,7 @@ Config_t AppConfig::loadConfig()
   
   config.sendW25Q.filePath = setting_.value("ToolBar/w25qxx/filePath", QDir::currentPath()).toString();
   config.sendW25Q.dataSize = setting_.value("ToolBar/w25qxx/flashSize", 256).toInt();
-  config.sendW25Q.cmd = setting_.value("ToolBar/w25qxx/cmd", "01 10 00 00 00 00").toString();
+  config.sendW25Q.cmd = setting_.value("ToolBar/w25qxx/cmd", "01 10").toString();
   config.sendW25Q.ack = setting_.value("ToolBar/w25qxx/ack", "80").toString();
   config.sendW25Q.timeoutMs = setting_.value("ToolBar/w25qxx/timeoutMs", 200).toInt();
   config.flashIdx = setting_.value("ToolBar/w25qxx/flashIdx", 0).toInt();

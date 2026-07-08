@@ -11,7 +11,7 @@ SendFileDialog::SendFileDialog(SendFile_t sendFileConfig, QWidget *parent)
   ui->setupUi(this);
   this->setFixedSize(size());
   this->setWindowTitle("文件传输");
-  qDebug()<<this->width()<<" "<<this->height();
+  qDebug() << "width =" << this->width() << "height =" << this->height();
 
   ui->lineEdit_Ack->setMaxLength(2);
 
@@ -22,6 +22,7 @@ SendFileDialog::SendFileDialog(SendFile_t sendFileConfig, QWidget *parent)
     ui->label_SendModel->setText("网络传输");
   else if(config_.model == 2)
     ui->label_SendModel->setText("蓝牙传输");
+
   // 初始化显示到UI
   ui->lineEdit_FilePath->setText(config_.filePath);
   ui->spinBox_DataSize->setValue(config_.dataSize);
@@ -50,17 +51,19 @@ SendFile_t SendFileDialog::getConfig() const
   return cfg;
 }
 
-QProgressBar *SendFileDialog::getProgress()
+QProgressBar* SendFileDialog::getProgress()
 {
   return ui->progressBar;
 }
 
 void SendFileDialog::on_btn_OpenFile_clicked()
 {
-  QString name = QFileDialog::getOpenFileName(this, "选择文件", config_.filePath,
-                                 "二进制文件 (*.bin)");
-  if(name.isEmpty())
-    return;
+  QString name = QFileDialog::getOpenFileName(this, "选择文件", 
+    config_.filePath, "二进制文件 (*.bin)"
+  );
+
+  if(name.isEmpty()) return;
+
   ui->lineEdit_FilePath->setText(name);
 }
 

@@ -52,13 +52,13 @@ SendFile_t SendW25Qxx::getConfig(int *flashIdx) const
 
   cfg.filePath = ui->lineEdit_filePath->text();
   cfg.dataSize = ui->spinBox_flashPageSize->value();
-  cfg.cmd = ui->lineEdit_cmd->text();
+  cfg.cmd = ui->lineEdit_cmd->text() + " " + ui->lineEdit_reg->text();
   cfg.ack = ui->lineEdit_ack->text();
   cfg.timeoutMs = ui->spinBox_timeout->value();
 
   if(flashIdx)
     *flashIdx = ui->spinBox_flashPageIdx->value();
-    
+
   return cfg;
 }
 
