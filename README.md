@@ -34,10 +34,16 @@
 
 - 新增w25qxx指令
 
-## 编译环境
+## 源码编译
 
-Qt6.11.1 + MinGW + Windows10 64位
+```bash
+# 配置 CMakePresets.json 中 qt6 安装路径后
+cmake --preset release					# 创建build目录并配置项目
+cmake --build build/release -j 16		# 并行构建项目
+cd build/release && ./SerialTool.exe	# 执行exe文件
+```
 
 ### 待更新
 - 蓝牙模式
 - 服务端模式支持多客户端连接
+- 文件传输加结束帧

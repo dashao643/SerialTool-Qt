@@ -109,13 +109,19 @@ void SendW25Qxx::pageCntRefresh(int flashSize, int pageSize)
 
 void SendW25Qxx::sectorRangeRefresh(int basePage)
 {
+  // 占用页数
   int pageCnt = ui->label_flashPageCnt->text().toInt();
+  // 页大小
   int pageSize = ui->spinBox_flashPageSize->value();
 
+  // 起始字节 = 起始页索引 * 页大小
   int startByte = basePage * pageSize;
+  // 结束字节 = (起始页索引 + 页数) * 页大小 - 1
   int endByte = (basePage + pageCnt) * pageSize - 1;
 
+  // 起始扇区索引 = 起始字节 / 扇区大小
   int startSector = startByte / FLASH_SECTOR_SIZE;
+  // 结束扇区索引 = 结束字节 / 扇区大小
   int endSector = endByte / FLASH_SECTOR_SIZE;
 
   ui->label_sectorRange->setText(QString("%1 - %2").arg(startSector).arg(endSector));
