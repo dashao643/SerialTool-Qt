@@ -14,18 +14,18 @@ const QString CONFIG_FILE_NAME = "setting.ini";
 
 class AppConfig : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 public:
-  explicit AppConfig(QObject *parent = nullptr);
-  Config_t loadConfig();
-  void saveConfig(const Config_t &config);
-  QList<TabPageConfig> loadTabPage();
-  void saveTabPage(const QTabWidget *tabWiget);
+    explicit AppConfig(QObject *parent = nullptr);
+    Config_t loadConfig();
+    void saveConfig(const Config_t &config);
+    QList<TabPageConfig> loadTabPage();
+    void saveTabPage(const QTabWidget *tabWiget);
 
 private:
-  QSettings setting_;
+    QSettings setting_;
 
-  void saveListWidget(TabPage *tabPage, int index);
+    void saveListWidget(TabPage *tabPage, int index);
 
 signals:
 };

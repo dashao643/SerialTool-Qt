@@ -14,30 +14,30 @@ class CustomItem;
 
 class CustomItem : public QWidget
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  explicit CustomItem(QWidget *parent = nullptr);
-  ~CustomItem();
+    explicit CustomItem(QWidget *parent = nullptr);
+    ~CustomItem();
 
-  void setRemark(const QString remark);
-  void setContent(const QString content);
-  void setModel(const SendModel model);
+    void setRemark(const QString remark);
+    void setContent(const QString content);
+    void setModel(const SendModel model);
 
-  QString getRemark();
-  QString getContent();
-  SendModel getModel();
+    QString getRemark();
+    QString getContent();
+    SendModel getModel();
 
-  QPushButton* getSendBtn();
+    QPushButton* getSendBtn();
 
 private:
-  Ui::CustomItem *ui;
+    Ui::CustomItem *ui;
 
 private slots:
-  void on_btn_Send_clicked();
+    void on_btn_Send_clicked();
 
 signals:
-  void sendDataRequest(QString content, SendModel sendmodel);
+    void sendDataRequest(QString content, SendModel sendmodel);
 };
 
 #endif // CUSTOMITEM_H

@@ -24,8 +24,8 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
 qt_standard_project_setup()
 
 qt_add_executable(${CMAKE_PROJECT_NAME}
-	MACOSX_BUNDLE           # 启用qDebug()
-	# WIN32 MACOSX_BUNDLE     # 关闭qDebug()
+	# MACOSX_BUNDLE           # 启用qDebug()
+	WIN32 MACOSX_BUNDLE     # 关闭qDebug()
 
 	src/main.cpp
 
