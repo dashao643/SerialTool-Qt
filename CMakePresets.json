@@ -4,7 +4,6 @@
         {
             "name": "debug",
             "displayName": "MinGW Debug",
-            "description": "使用 Qt 自带的 MinGW 13.1.0 编译 Debug 版",
             "generator": "MinGW Makefiles",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
@@ -17,7 +16,6 @@
         {
             "name": "release",
             "displayName": "MinGW Release",
-            "description": "使用 Qt 自带的 MinGW 13.1.0 编译 Release 版",
             "generator": "MinGW Makefiles",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {

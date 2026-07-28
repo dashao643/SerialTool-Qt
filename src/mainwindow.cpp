@@ -163,16 +163,18 @@ void MainWindow::slotsInit()
     connect(ui->actAddItem,&QAction::triggered,this,[=](){
         do_addItemToList();
     });
-    connect(ui->actSendFile,&QAction::triggered,this,[=](){
+    // 传输文件槽函数
+    connect(ui->actSendFile, &QAction::triggered, this, [=](){
         sendFile_.model = ui->cbBox_Model->currentIndex();
         SendFileDialog dialog(sendFile_, this);
-        connect(&dialog,&SendFileDialog::download,this,[=, &dialog](const SendFile_t &cfg){
+        connect(&dialog, &SendFileDialog::download, this, [=, &dialog](const SendFile_t &cfg){
             do_fileDownload(cfg, dialog.getProgress());
         });
         dialog.exec();
         isFileDownload = false;
         sendFile_ = dialog.getConfig();
     });
+    // 传输w25q槽函数
     connect(ui->actSendW25Q, &QAction::triggered, this, [=](){
         sendW25Q_.model = ui->cbBox_Model->currentIndex();
         SendW25Qxx dialog(sendW25Q_, flashIdx_, this);
@@ -450,6 +452,10 @@ void MainWindow::do_showReceivedData()
     QString strReceive;
     if(ui->rdBtn_ShowASCII->isChecked()){
         strReceive = QString::fromUtf8(receiveBuffer_);
+        // 换行符转成 <br>
+        strReceive.replace("\n", "<br>");
+        // 制表符转成 4 个空格
+        strReceive.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
     }
     else if(ui->rdBtn_ShowHex->isChecked()){
         strReceive = receiveBuffer_.toHex(' ').toUpper();;
@@ -644,6 +650,12 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
     QByteArray content = file.readAll();
     file.close();
 
+    // 取消文字选中, 防止大量计算字符数
+    ui->plainTextEdit_Show->moveCursor(QTextCursor::End);
+    // 如果当前是 ascii 模式, 先切换成 hex 防止卡顿
+    bool isAscii = ui->rdBtn_ShowASCII->isChecked();
+    ui->rdBtn_ShowHex->setChecked(true);
+
     progressBar->setMaximum(content.size());
 
     // 阻塞式写法。先发送握手命令，附带校验
@@ -652,6 +664,8 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
     sendData(config.cmd, HEX);
     bool ackOK = waitAck(config.ack, config.timeoutMs);
     if (!ackOK) {
+        // 切换回isAscii模式
+        ui->rdBtn_ShowASCII->setChecked(isAscii);
         QMessageBox::critical(this,"提示","等待超时, 升级或传输失败");
         return;
     }
@@ -671,12 +685,15 @@ void MainWindow::do_fileDownload(const SendFile_t &config, QProgressBar *progres
         showSendData(pack);
 
         if (!waitAck(config.ack, config.timeoutMs)) {
+            ui->rdBtn_ShowASCII->setChecked(isAscii);
             QMessageBox::critical(this,"提示","ACK超时, 升级或传输失败");
             return;
         }
         sent += len;
         progressBar->setValue(sent);
     }
+    ui->rdBtn_ShowASCII->setChecked(isAscii);
+
     QMessageBox::information(this,"完成","文件发送成功!");
 }
 

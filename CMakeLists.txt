@@ -74,13 +74,12 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 	APP_VERSION="${PROJECT_VERSION}"
 )
 
-target_link_libraries(${CMAKE_PROJECT_NAME}
-	PRIVATE
-		Qt::Core
-		Qt::Gui
-		Qt::Widgets
-		Qt::SerialPort
-		Qt::Network
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+	Qt::Core
+	Qt::Gui
+	Qt::Widgets
+	Qt::SerialPort
+	Qt::Network
 )
 
 include(GNUInstallDirs)

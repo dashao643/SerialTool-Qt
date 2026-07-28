@@ -11,32 +11,32 @@ typedef enum{
     SERIAL = 0,
     NETWORK,
     BLUETOOTH
-}ComModel;
+} ComModel;
 
 typedef enum{
     HEX = 0,
     ASCII,
-}SendModel;
+} SendModel;
 
 typedef enum{
     NONE_CHECK = 0,
     MODBUS_CRC16,
     ADD8,
-}CheckDataIndex;
+} CheckDataIndex;
 
 typedef struct{
     QSerialPort::DataBits    dataBits;
     QSerialPort::StopBits    stopBits;
     QSerialPort::Parity      parity;
     QSerialPort::FlowControl flowControl;
-}SerialConfigStruct;
+} SerialConfigStruct;
 
 typedef struct
 {
     QString remark;
     QString content;
     SendModel model;
-}ItemConfig;
+} ItemConfig;
 
 typedef struct{
     QString filePath;

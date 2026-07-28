@@ -46,4 +46,3 @@ cd build/release && ./SerialTool.exe	# 执行exe文件
 ### 待更新
 - 蓝牙模式
 - 服务端模式支持多客户端连接
-- 文件传输加结束帧

@@ -26,16 +26,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    QTimer *infoTimer_ = nullptr;
-    QTimer *rxTimer_ = nullptr;
-    QTimer *sendTimer_ = nullptr;
-
-    QByteArray receiveBuffer_;                             // 接收缓冲区
-    QString fileSavePath_;
-    SendFile_t sendFile_;
-    SendFile_t sendW25Q_;
-    int flashIdx_ = 0;
-
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void cbBoxInit();
@@ -44,14 +34,6 @@ public:
     void slotsInit();
 
 private:
-    AppConfig *appConfig_;
-    SerialManager *serialManager_;
-    NetworkManager *networkManager_;
-    bool isConnected_ = false;
-    bool isFileDownload = false;
-    QByteArray fileReceiveBuffer_;
-    Ui::MainWindow *ui;
-
     void loadPageConfig();
     void sendData(QString content, SendModel model = HEX);
     void showSendData(const QByteArray &sendBuf);
@@ -80,15 +62,34 @@ private slots:
     void on_actAddTab_triggered();
     void on_actDelTab_triggered();
     void on_actBackgroundSetting_triggered();
+    void on_actTimeSyn_triggered();
 
     void on_tabWidget_tabBarDoubleClicked(int index);
     void on_tabWidget_customContextMenuRequested(const QPoint &pos);
-
+    void on_toolBar_customContextMenuRequested(const QPoint &pos);
+    
 protected:
     void closeEvent(QCloseEvent *event) override;
 
-private slots:
-    void on_toolBar_customContextMenuRequested(const QPoint &pos);
-    void on_actTimeSyn_triggered();
+private:
+    Ui::MainWindow *ui;
+
+    AppConfig *appConfig_;
+    SerialManager *serialManager_;
+    NetworkManager *networkManager_;
+
+    QTimer *infoTimer_ = nullptr;
+    QTimer *rxTimer_ = nullptr;
+    QTimer *sendTimer_ = nullptr;
+
+    QByteArray receiveBuffer_;                             // 接收缓冲区
+    QString fileSavePath_;
+    SendFile_t sendFile_;
+    SendFile_t sendW25Q_;
+    int flashIdx_ = 0;
+
+    bool isConnected_ = false;
+    bool isFileDownload = false;
+    QByteArray fileReceiveBuffer_;
 };
 #endif // MAINWINDOW_H
