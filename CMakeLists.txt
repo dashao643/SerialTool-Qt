@@ -23,9 +23,16 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
 
 qt_standard_project_setup()
 
+# message("dashao")
+
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+	set(EXE_FLAGS WIN32)			# windows 平台关闭终端显示
+else()
+	set(EXE_FLAGS "")
+endif()
+
 qt_add_executable(${CMAKE_PROJECT_NAME}
-	# MACOSX_BUNDLE           # 启用qDebug()
-	WIN32 MACOSX_BUNDLE     # 关闭qDebug()
+	${EXE_FLAGS}     
 
 	src/main.cpp
 
