@@ -6,15 +6,31 @@
 NetworkManager::NetworkManager(QObject *parent)
     : QObject{parent}
 {
+    tcpSocketList_.clear();
+
     tcpServer_ = new QTcpServer(this);
-    tcpSocket_ = new QTcpSocket(this);
     tcpClient_ = new QTcpSocket(this);
     udpSocket_ = new QUdpSocket(this);
+
     // 强制关闭代理
     tcpClient_->setProxy(QNetworkProxy::NoProxy);
     udpSocket_->setProxy(QNetworkProxy::NoProxy);
 
     slotsInit();
+}
+
+NetworkManager::~NetworkManager()
+{
+    foreach(QTcpSocket *tcpSocket, tcpSocketList_) {
+        if(tcpSocket != nullptr && tcpSocket->state() == QAbstractSocket::ConnectedState){
+            tcpSocket->disconnectFromHost();
+        }
+        tcpSocket->deleteLater();
+    }
+    if (tcpServer_->isListening()) {
+        // 关闭网络监听
+        tcpServer_->close();                     
+    }
 }
 
 void NetworkManager::slotsInit()
@@ -38,7 +54,19 @@ void NetworkManager::slotsInit()
     connect(udpSocket_,&QUdpSocket::readyRead,this,&NetworkManager::do_socketReadyRead);
 }
 
-void NetworkManager::ipInit(QComboBox *comboBox)
+void NetworkManager::clearTcpSocketList()
+{
+    for(QTcpSocket *tcpSocket : tcpSocketList_) {
+        if(tcpSocket != nullptr && tcpSocket->state() == QAbstractSocket::ConnectedState){
+            tcpSocket->disconnectFromHost();
+        }
+        tcpSocket->deleteLater();
+    }
+
+    tcpSocketList_.clear();
+}
+
+void NetworkManager::loadLocalIP(QComboBox *comboBox)
 {
     // 返回本地全部网卡对象列表
     QList<QNetworkInterface> interfaceList = QNetworkInterface::allInterfaces();
@@ -66,12 +94,11 @@ void NetworkManager::closeConnection()
     isOpen_ = false;
     curNetworkModel_ = None;
 
-    if (tcpSocket_) {
-        tcpSocket_->close();
-    }
-    if (tcpServer_ && tcpServer_->isListening()) {
+    if (tcpServer_->isListening()) {
         tcpServer_->close();
+        clearTcpSocketList();
     }
+
     if (tcpClient_) {
         tcpClient_->abort();
     }
@@ -81,9 +108,12 @@ void NetworkManager::closeConnection()
 
 void NetworkManager::sendData(const QByteArray &content)
 {
-    if(curNetworkModel_ == TcpServer && tcpSocket_ &&
-        tcpSocket_->state() == QAbstractSocket::ConnectedState){
-            tcpSocket_->write(content);
+    if(curNetworkModel_ == TcpServer) {
+        // 向所有客户端广播发送
+        for(QTcpSocket *tcpSocket : tcpSocketList_) {
+            if(tcpSocket && tcpSocket->state() == QAbstractSocket::ConnectedState)
+                tcpSocket->write(content);
+        }
     }
     else if(curNetworkModel_ == TcpClient && tcpClient_->state() == QAbstractSocket::ConnectedState){
         tcpClient_->write(content);
@@ -91,15 +121,18 @@ void NetworkManager::sendData(const QByteArray &content)
     else if(curNetworkModel_ == UDP){
         QHostAddress targetAddr(udpTargetIP_);
         udpSocket_->writeDatagram(content, targetAddr, udpTargetPort_);
-        // qDebug()<<"测试network";
     }
-    qDebug()<<curNetworkModel_;
-    qDebug()<<udpSocket_->state();
+}
+
+int NetworkManager::getClientCnt()
+{
+    return tcpSocketList_.size();
 }
 
 // TCP使用
 void NetworkManager::do_btnOpenClose(CurNetworkModel networkModel, QString ip, quint16 port)
 {
+    // 当前是关闭状态, 开启
     if(!isOpen_){
         curNetworkModel_ = networkModel;
         if(curNetworkModel_ == TcpServer){
@@ -113,13 +146,12 @@ void NetworkManager::do_btnOpenClose(CurNetworkModel networkModel, QString ip, q
             tcpClient_->connectToHost(ip, port);
         }
     }
+    // 当前是开启状态, 关闭
     else{
-        // 关闭服务端
+        // 关闭服务端, 清空 Socket 列表
         if (tcpServer_->isListening()){
-            if (tcpSocket_ && tcpSocket_->state() == QAbstractSocket::ConnectedState) {
-                tcpSocket_->disconnectFromHost();
-            }
             tcpServer_->close();
+            clearTcpSocketList();
         }
         // 关闭客户端
         if (tcpClient_->state() == QAbstractSocket::ConnectedState ||
@@ -158,25 +190,27 @@ void NetworkManager::do_btnOpenClose(quint16 localport, QString targetIp, quint1
 
 void NetworkManager::do_newConnection()
 {
-    // 如果已有客户端，先断开、释放
-    if (tcpSocket_){
-        tcpSocket_->disconnect();
-        tcpSocket_->disconnectFromHost();
-        tcpSocket_->deleteLater();
-        tcpSocket_ = nullptr;
-    }
-    tcpSocket_ = tcpServer_->nextPendingConnection();
+    // 创建新客户端 socket, 加入列表
+    QTcpSocket *tcpSocket = tcpServer_->nextPendingConnection();
+    tcpSocketList_.push_back(tcpSocket);
 
-    // 主动发送当前状态（连接后才得到的socket）
-    emit sgn_stateChange(tcpSocket_->state());
+    emit sgn_stateChange(tcpSocket->state());
 
-    connect(tcpSocket_,&QTcpSocket::stateChanged,this,&NetworkManager::sgn_stateChange);
-    connect(tcpSocket_,&QTcpSocket::disconnected,this,[=](){
-        tcpSocket_->deleteLater();
-        tcpSocket_ = nullptr;
+    connect(tcpSocket, &QTcpSocket::disconnected, this, [this, tcpSocket]() {
+        qInfo() << "client disconnected: " + tcpSocket->peerAddress().toString();
+        tcpSocketList_.removeOne(tcpSocket);
+
+        // Socket数为0, 真正断开连接
+        if(tcpSocketList_.size() == 0)
+            emit sgn_stateChange(tcpSocket->state());
+        else
+            emit sgn_stateChange(QAbstractSocket::ConnectedState);
+
+        tcpSocket->deleteLater();
     });
-    connect(tcpSocket_,&QTcpSocket::readyRead,this,[=](){
-        sgn_readyRead(tcpSocket_->readAll());
+
+    connect(tcpSocket, &QTcpSocket::readyRead, this, [this, tcpSocket]() {
+        sgn_readyRead(tcpSocket->readAll());
     });
 }
 

@@ -2,27 +2,32 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "debug",
-            "displayName": "MinGW Debug",
+            "name": "default",
+            "hidden": true,
             "generator": "MinGW Makefiles",
-            "binaryDir": "${sourceDir}/build/debug",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/gcc.exe",
                 "CMAKE_CXX_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/g++.exe",
-                "CMAKE_PREFIX_PATH": "E:/Qt/6.11.0/mingw_64"
+                "CMAKE_PREFIX_PATH": "E:/Qt/6.11.0/mingw_64",
+                "CMAKE_LINKER": "E:/Qt/Tools/mingw1310_64/bin/ld.exe"
+            }
+        },
+        {
+            "name": "debug",
+            "inherits": "default",
+            "displayName": "MinGW Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
             "name": "release",
+            "inherits": "default",
             "displayName": "MinGW Release",
-            "generator": "MinGW Makefiles",
-            "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_C_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/gcc.exe",
-                "CMAKE_CXX_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/g++.exe",
-                "CMAKE_PREFIX_PATH": "E:/Qt/6.11.0/mingw_64"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ]

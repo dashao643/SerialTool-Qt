@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.19)
 set(CMAKE_PROJECT_NAME SerialTool)
 
 project(${CMAKE_PROJECT_NAME} 
-	VERSION 1.2.1
+	VERSION 1.2.3
 	LANGUAGES CXX
 )
 

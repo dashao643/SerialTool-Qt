@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setObjectName("MainWindow");
     ui->btn_PortRefresh->setText("");
     ui->btn_OpenClose->setProperty("connected", false);
-    qDebug() << "width =" << this->width() << "height =" << this->height();
+    qInfo() << "width =" << this->width() << "height =" << this->height();
     this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
 
     cbBoxInit();
@@ -81,7 +81,7 @@ void MainWindow::uiInit()
     // 初始化标准串口波特率
     serialManager_->baudRateInit(ui->cbBox_PortBuad);
     // 初始化本地IP
-    networkManager_->ipInit(ui->cbBox_LocalIP);
+    networkManager_->loadLocalIP(ui->cbBox_LocalIP);
     ui->tabWidget->clear();
     loadPageConfig();
     ui->tabWidget->setCurrentIndex(0);
@@ -418,16 +418,24 @@ void MainWindow::do_netWorkStateUpdate(QAbstractSocket::SocketState state)
         else if(ui->cbBox_Network->currentIndex() == 1)
             ui->label_InfoR->setText("网络状态：连接失败");
         break;
-    case QAbstractSocket::ConnectedState:
-        ui->label_InfoR->setText("网络状态：已连接");           break;
+    case QAbstractSocket::ConnectedState: {
+        int curgetClientCnt = networkManager_->getClientCnt();
+        // 状态变为已连接, curgetClientCnt仍未零, 为客户端模式
+        if(curgetClientCnt == 0) 
+            ui->label_InfoR->setText("网络状态：已连接");
+        // 服务端模式, 显示已连接的客户端数
+        else
+            ui->label_InfoR->setText(QString("已连接数：%1").arg(curgetClientCnt));
+        break;
+    }
     case QAbstractSocket::ClosingState:
-        ui->label_InfoR->setText("网络状态：正在关闭...");         break;
+        ui->label_InfoR->setText("网络状态：正在关闭...");          break;
     case QAbstractSocket::ListeningState:
-        ui->label_InfoR->setText("网络状态：监听中...");       break;
+        ui->label_InfoR->setText("网络状态：监听中...");            break;
     case QAbstractSocket::HostLookupState:
-        ui->label_InfoR->setText("网络状态：正在解析主机域名...");  break;
+        ui->label_InfoR->setText("网络状态：正在解析主机域名...");   break;
     case QAbstractSocket::ConnectingState:
-        ui->label_InfoR->setText("连接中...");                break;
+        ui->label_InfoR->setText("连接中...");                     break;
     case QAbstractSocket::BoundState:
         break;
     }
