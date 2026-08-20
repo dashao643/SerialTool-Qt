@@ -13,6 +13,7 @@
 #include <QColorDialog>
 #include <QThread>
 #include <QElapsedTimer>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -138,7 +139,7 @@ void MainWindow::slotsInit()
         QMessageBox::information(this, "提示", string);
     });
     // 选择模式
-    connect(ui->cbBox_Model,&QComboBox::currentIndexChanged,this,[=](int index){
+    connect(ui->cbBox_Model,QOverload<int>::of(&QComboBox::currentIndexChanged),this,[=](int index){
         // 切换模式时关闭所有连接，避免冲突
         serialManager_->closeConnection();
         networkManager_->closeConnection();
@@ -186,11 +187,11 @@ void MainWindow::slotsInit()
         sendW25Q_ = dialog.getConfig(&flashIdx_);
     });
     // 波特率修改
-    connect(ui->cbBox_PortBuad,&QComboBox::currentIndexChanged,serialManager_,[=](){
+    connect(ui->cbBox_PortBuad,QOverload<int>::of(&QComboBox::currentIndexChanged),serialManager_,[=](){
         serialManager_->setBuadRate(ui->cbBox_PortBuad->currentText().toInt());
     });
     // TCP服务端禁用远程ip设置。UDP禁用本地IP设置
-    connect(ui->cbBox_Network,&QComboBox::currentIndexChanged,[=](int index){
+    connect(ui->cbBox_Network,QOverload<int>::of(&QComboBox::currentIndexChanged),[=](int index){
         ui->lineEdit_RemoteIP->setDisabled(index == TcpServer);
         ui->lineEdit_RemotePort->setDisabled(index == TcpServer);
         ui->cbBox_LocalIP->setDisabled(index == UDP);

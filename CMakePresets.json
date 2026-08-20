@@ -2,12 +2,11 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "default",
+            "name": "Windows",
             "hidden": true,
             "generator": "MinGW Makefiles",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/gcc.exe",
                 "CMAKE_CXX_COMPILER": "E:/Qt/Tools/mingw1310_64/bin/g++.exe",
                 "CMAKE_LINKER": "E:/Qt/Tools/mingw1310_64/bin/ld.exe",
@@ -16,7 +15,7 @@
         },
         {
             "name": "debug",
-            "inherits": "default",
+            "inherits": "Windows",
             "displayName": "MinGW Debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
@@ -24,8 +23,30 @@
         },
         {
             "name": "release",
-            "inherits": "default",
+            "inherits": "Windows",
             "displayName": "MinGW Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "Linux",
+            "hidden": true,
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "LinuxDebug",
+            "inherits": "Linux",
+            "displayName": "GCC Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "LinuxRelease",
+            "inherits": "Linux",
+            "displayName": "GCC Release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
