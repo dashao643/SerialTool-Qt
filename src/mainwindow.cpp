@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->btn_PortRefresh->setText("");
     ui->btn_OpenClose->setProperty("connected", false);
     qInfo() << "width =" << this->width() << "height =" << this->height();
-    this->setWindowTitle(QString("串口工具-v%1").arg(APP_VERSION));
+    this->setWindowTitle(QString("dashao-SerialTool-v%1").arg(APP_VERSION));
 
     cbBoxInit();
     dataInit();

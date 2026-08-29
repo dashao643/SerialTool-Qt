@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	// Use Fusion style for consistent QSS rendering across platforms
-	// a.setStyle(QStyleFactory::create("Fusion"));
+	a.setApplicationName("dashao");
+	a.setApplicationVersion(APP_VERSION);
 
 	// Load and apply stylesheet
 	QFile styleFile(":/style.qss");
