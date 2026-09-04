@@ -264,7 +264,7 @@ void MainWindow::showSendData(const QByteArray &sendBuf)
     QString strTime = QTime::currentTime().toString("HH:mm:ss.zzz");
     QString strSend;
     if(ui->rdBtn_ShowASCII->isChecked()){
-        strSend = QString::fromUtf8(sendBuf);
+        strSend = QString::fromLocal8Bit(sendBuf);
     }
     else if(ui->rdBtn_ShowHex->isChecked()){
         strSend = sendBuf.toHex(' ').toUpper();;
@@ -460,7 +460,8 @@ void MainWindow::do_showReceivedData()
 
     QString strReceive;
     if(ui->rdBtn_ShowASCII->isChecked()){
-        strReceive = QString::fromUtf8(receiveBuffer_);
+        // strReceive = QString::fromUtf8(receiveBuffer_);
+        strReceive = QString::fromLocal8Bit(receiveBuffer_);
         // 换行符转成 <br>
         strReceive.replace("\n", "<br>");
         // 制表符转成 4 个空格
@@ -512,7 +513,7 @@ void MainWindow::on_btn_Send_clicked()
     if (ui->rdBtn_SendASCII->isChecked()){
         sendModel = ASCII;
     }
-    sendData(content,sendModel);
+    sendData(content, sendModel);
 
     if(ui->ckBox_SendByTime->isChecked()){
         int ms = ui->spBox_SendTime->value();
