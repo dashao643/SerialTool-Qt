@@ -48,7 +48,7 @@ SendW25Qxx::~SendW25Qxx()
 
 SendFile_t SendW25Qxx::getConfig(int *flashIdx) const
 {
-    SendFile_t cfg = {0};
+    SendFile_t cfg{};
 
     cfg.filePath = ui->lineEdit_filePath->text();
     cfg.dataSize = ui->spinBox_flashPageSize->value();

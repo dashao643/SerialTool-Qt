@@ -104,6 +104,9 @@ void MainWindow::uiInit()
     ui->lineEdit_LocalPort->setText(config.localPort);
     ui->lineEdit_RemoteIP->setText(config.remoteIP);
     ui->lineEdit_RemotePort->setText(config.remotePort);
+
+    ui->rdBtn_SendASCII->setChecked(!config.isHexSend);
+    ui->rdBtn_ShowASCII->setChecked(!config.isHexShow);
 }
 
 void MainWindow::slotsInit()
@@ -625,9 +628,8 @@ CustomItem* MainWindow::do_addItemToList(int row, bool isInsert)
 
     TabPage* tabPage = qobject_cast<TabPage*>(ui->tabWidget->currentWidget());
     QListWidget *listWidget = tabPage->getListWidget();
-    if(isInsert){
+    if(isInsert)
         listWidget->insertItem(row, item);
-    }
     else
         listWidget->addItem(item);
     listWidget->setItemWidget(item, addItem);
@@ -773,6 +775,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     config.localPort = ui->lineEdit_LocalPort->text();
     config.remoteIP = ui->lineEdit_RemoteIP->text();
     config.remotePort = ui->lineEdit_RemotePort->text();
+    config.isHexSend = ui->rdBtn_SendHex->isChecked();
+    config.isHexShow = ui->rdBtn_ShowHex->isChecked();
     appConfig_->saveConfig(config);
 
     appConfig_->saveTabPage(ui->tabWidget);

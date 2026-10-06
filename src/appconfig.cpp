@@ -49,6 +49,9 @@ Config_t AppConfig::loadConfig()
     config.remoteIP = setting_.value("Network/remoteIP", "192.168.31.155").toString();
     config.remotePort = setting_.value("Network/remotePort", "65535").toString();
 
+    config.isHexSend = setting_.value("Send/isHexSend", true).toBool();
+    config.isHexShow = setting_.value("Show/isHexShow", true).toBool();
+
     return config;
 }
 
@@ -77,6 +80,9 @@ void AppConfig::saveConfig(const Config_t &config)
     setting_.setValue("Network/localPort", config.localPort);
     setting_.setValue("Network/remoteIP", config.remoteIP);
     setting_.setValue("Network/remotePort", config.remotePort);
+
+    setting_.setValue("Send/isHexSend", config.isHexSend);
+    setting_.setValue("Show/isHexShow", config.isHexShow);
 }
 
 QList<TabPageConfig> AppConfig::loadTabPage()

@@ -7,38 +7,37 @@
 
 // 公共数据结构定义
 
-typedef enum{
+typedef enum {
     SERIAL = 0,
     NETWORK,
     BLUETOOTH
 } ComModel;
 
-typedef enum{
+typedef enum {
     HEX = 0,
     ASCII,
 } SendModel;
 
-typedef enum{
+typedef enum {
     NONE_CHECK = 0,
     MODBUS_CRC16,
     ADD8,
 } CheckDataIndex;
 
-typedef struct{
+typedef struct {
     QSerialPort::DataBits    dataBits;
     QSerialPort::StopBits    stopBits;
     QSerialPort::Parity      parity;
     QSerialPort::FlowControl flowControl;
 } SerialConfigStruct;
 
-typedef struct
-{
+typedef struct {
     QString remark;
     QString content;
     SendModel model;
 } ItemConfig;
 
-typedef struct{
+typedef struct {
     QString filePath;
     int dataSize; // (flashSize)
     QString cmd;
@@ -47,13 +46,12 @@ typedef struct{
     int model;
 } SendFile_t;
 
-typedef struct
-{
+typedef struct {
     QString name;
     QList<ItemConfig> items;
 } TabPageConfig;
 
-typedef struct{
+typedef struct {
     QSize windowSize;
     int baudRateIndex;
     CheckDataIndex check;
@@ -66,6 +64,8 @@ typedef struct{
     QString localPort;
     QString remoteIP;
     QString remotePort;
+    bool isHexSend;
+    bool isHexShow;
 } Config_t;
 
 #endif // DATASTRUCTURE_H
